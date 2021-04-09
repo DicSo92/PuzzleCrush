@@ -1,0 +1,2 @@
+rootProject.name='PuzzleCrush'
+include ':app'
