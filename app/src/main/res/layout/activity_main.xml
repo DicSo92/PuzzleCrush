@@ -24,7 +24,7 @@
 
         android:shadowColor="@android:color/black"
         android:shadowDx="0"
-        android:shadowDy="-5"
+        android:shadowDy="5"
         android:shadowRadius="10"
 
         app:layout_constraintBottom_toBottomOf="parent"
@@ -34,7 +34,7 @@
         app:layout_constraintVertical_bias="0.300" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_newGame"
         android:layout_width="300sp"
         android:layout_height="70sp"
         android:elevation="10sp"
