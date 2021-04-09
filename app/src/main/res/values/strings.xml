@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PuzzleCrush</string>
+    <string name="display_name">Puzzle Crush</string>
+    <string name="new_game">New Game</string>
 </resources>
