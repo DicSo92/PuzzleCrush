@@ -6,4 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".GameActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/landscape_3"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
