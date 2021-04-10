@@ -3,10 +3,13 @@ package com.game.puzzlecrush;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.Chronometer;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -19,6 +22,12 @@ public class GameActivity extends AppCompatActivity {
     private GameActivity activity;
     private GridLayout gridLayout;
 
+    private Chronometer chronometer;
+    private boolean runningChrono;
+    private long pauseOffset;
+
+    ArrayList<ImageView> gemList = new ArrayList<>();
+    private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
     private int[] gems = {
             R.drawable.gem_blue,
             R.drawable.gem_green,
@@ -26,9 +35,6 @@ public class GameActivity extends AppCompatActivity {
             R.drawable.gem_red,
             R.drawable.gem_yellow,
     };
-
-    private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
-    ArrayList<ImageView> gemList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +50,32 @@ public class GameActivity extends AppCompatActivity {
         cellWidth = screenWidth / gridColCount;
 
         initGrid(); // Set grid col/row/size
-
         initBoardGems(); // For each cell, create image view with random gem img
-
         initGemsSwipeListener();
-
         initPausePopupListeners();
+
+        // Init Chronometer
+        this.chronometer = findViewById(R.id.chronometer);
+        startChronometer(chronometer);
+    }
+
+    public void startChronometer (View v) {
+        if (!runningChrono) {
+            chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
+            chronometer.start();
+            runningChrono = true;
+        }
+    }
+    public void pauseChronometer (View v) {
+        if (runningChrono) {
+            chronometer.stop();
+            pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+            runningChrono = false;
+        }
+    }
+    public void resetChronometer (View v) {
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        pauseOffset = 0;
     }
 
     private void initGrid () {
@@ -114,15 +140,28 @@ public class GameActivity extends AppCompatActivity {
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Init new Popup (PausePopup Class)
                 final PausePopup pausePopup = new PausePopup(activity);
 
-                // On click
+                // Pause Chronometer
+                pauseChronometer(chronometer);
+                // Cancel popup listener to restart chronometer
+                pausePopup.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        startChronometer(chronometer); // restart chronometer
+                    }
+                });
+
+                // On click continue Button
                 pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        startChronometer(chronometer); // restart chronometer
                         pausePopup.dismiss();
                     }
                 });
+                // On click BackMenu Button
                 pausePopup.getBtn_backMenu().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -132,6 +171,7 @@ public class GameActivity extends AppCompatActivity {
                         pausePopup.dismiss();
                     }
                 });
+                // Build/Create Popup
                 pausePopup.Build();
             }
         });
