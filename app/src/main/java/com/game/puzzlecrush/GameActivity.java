@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 public class GameActivity extends AppCompatActivity {
 
-    int[] gems = {
+    private int[] gems = {
             R.drawable.gem_blue,
             R.drawable.gem_green,
             R.drawable.gem_purple,
@@ -17,7 +17,7 @@ public class GameActivity extends AppCompatActivity {
             R.drawable.gem_yellow,
     };
 
-    int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
+    private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,8 @@ public class GameActivity extends AppCompatActivity {
             imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth));
             imageView.setMaxHeight(cellWidth);
             imageView.setMaxWidth(cellWidth);
+            // Set ImageView padding
+            imageView.setPadding(10,10,10,10);
             // Random int
             int randomGem = (int) Math.floor(Math.random() * gems.length);
             // display gem

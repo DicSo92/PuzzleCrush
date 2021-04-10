@@ -13,7 +13,8 @@
         android:layout_centerVertical="true"
         android:scaleType="fitXY"
         android:src="@drawable/landscape_3"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/landscape" />
 
 <!--    <GridLayout-->
 <!--        android:layout_width="match_parent"-->
@@ -25,13 +26,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/gemGrid"
-        android:background="#8800"
+        android:background="#66000000"
 
         android:layout_marginTop="300dp"
         android:layout_marginBottom="150dp"
 
-        android:columnCount="7"
-        android:rowCount="5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
