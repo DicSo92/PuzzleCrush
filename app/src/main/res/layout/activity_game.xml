@@ -16,11 +16,27 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:contentDescription="@string/landscape" />
 
-<!--    <GridLayout-->
+
+    <!--    <GridLayout-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="match_parent"-->
 <!--        android:background="#8800"-->
 <!--        android:id="@+id/gemGrid" />-->
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/colorPrimary"
+
+        android:contentDescription="@string/pauseBtn"
+        android:src="@android:drawable/ic_media_pause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <GridLayout
         android:layout_width="match_parent"

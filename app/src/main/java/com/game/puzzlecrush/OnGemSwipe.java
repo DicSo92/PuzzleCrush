@@ -20,8 +20,8 @@ public class OnGemSwipe implements View.OnTouchListener {
 
     private final class GestureListener extends GestureDetector.SimpleOnGestureListener
     {
-        public static final int SWIPE_THRESOLD = 100;
-        public static final int SWIPE_VELOCITY_THRESOLD = 100;
+        public static final int SWIPE_THRESHOLD = 100;
+        public static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
         @Override
         public boolean onDown(MotionEvent e) {
@@ -34,8 +34,9 @@ public class OnGemSwipe implements View.OnTouchListener {
             float yDiff = e2.getY() - e1.getY();
             float xDiff = e2.getX() - e1.getX();
 
-            if (Math.abs(xDiff) > Math.abs(yDiff)) { // If horizontal swipe
-                if (Math.abs(xDiff) > SWIPE_THRESOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESOLD) {
+            // If horizontal swipe
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                if (Math.abs(xDiff) > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                     if (xDiff > 0) {
                         swipeRight();
                     } else {
@@ -44,7 +45,8 @@ public class OnGemSwipe implements View.OnTouchListener {
                     result = true;
                 }
             }
-            else if (Math.abs(yDiff) > SWIPE_THRESOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESOLD) {
+            // If Vertical Swipe
+            else if (Math.abs(yDiff) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                 if (yDiff > 0) {
                     swipeBottom();
                 } else {
@@ -52,7 +54,6 @@ public class OnGemSwipe implements View.OnTouchListener {
                 }
                 result = true;
             }
-
             return result;
         }
     }

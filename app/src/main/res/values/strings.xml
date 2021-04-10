@@ -3,4 +3,7 @@
     <string name="display_name">Puzzle Crush</string>
     <string name="new_game">New Game</string>
     <string name="landscape">landscape</string>
+    <string name="test">lorem ipsum</string>
+    <string name="pauseBtn">Pause Button</string>
+    <string name="paused">Game Paused</string>
 </resources>
