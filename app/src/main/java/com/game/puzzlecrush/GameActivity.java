@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -18,6 +21,8 @@ public class GameActivity extends AppCompatActivity {
     };
 
     private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
+    ArrayList<ImageView> gemList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +40,35 @@ public class GameActivity extends AppCompatActivity {
         setGridParams(gridLayout); // Set grid col/row/size
 
         initBoardGems(gridLayout); // For each cell, create image view with random gem img
+
+        for (ImageView imageView : gemList) {
+            imageView.setOnTouchListener(new OnGemSwipe(this)
+            {
+                @Override
+                void swipeLeft() {
+                    super.swipeLeft();
+                    Toast.makeText(MainActivity.this, "Left", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                void swipeRight() {
+                    super.swipeRight();
+                    Toast.makeText(MainActivity.this, "Right", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                void swipeTop() {
+                    super.swipeTop();
+                    Toast.makeText(MainActivity.this, "Top", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                void swipeBottom() {
+                    super.swipeBottom();
+                    Toast.makeText(MainActivity.this, "Bottom", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void setGridParams (GridLayout gridLayout) {
@@ -59,6 +93,7 @@ public class GameActivity extends AppCompatActivity {
             int randomGem = (int) Math.floor(Math.random() * gems.length);
             // display gem
             imageView.setImageResource(gems[randomGem]);
+            gemList.add(imageView);
             gridLayout.addView(imageView);
         }
     }
