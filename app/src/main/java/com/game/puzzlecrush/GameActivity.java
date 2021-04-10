@@ -57,6 +57,16 @@ public class GameActivity extends AppCompatActivity {
         // Init Chronometer
         this.chronometer = findViewById(R.id.chronometer);
         startChronometer(chronometer);
+        // Reset timer after 30 seconds (feature test)
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 30 * 1000) {
+                    chronometer.setBase(SystemClock.elapsedRealtime());
+                    Toast.makeText(GameActivity.this, "Reset Timer !", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void startChronometer (View v) {
