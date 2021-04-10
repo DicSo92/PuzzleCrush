@@ -30,23 +30,32 @@ public class GameActivity extends AppCompatActivity {
         screenWidth = displayMetrics.widthPixels;
         cellWidth = screenWidth / gridColCount;
 
+        GridLayout gridLayout = findViewById(R.id.gemGrid); // Get grid
 
-        // Set grid col/raw/size
-        GridLayout gridLayout = findViewById(R.id.gemGrid);
+        setGridParams(gridLayout); // Set grid col/row/size
+
+        initBoardGems(gridLayout); // For each cell, create image view with random gem img
+    }
+
+    private void setGridParams (GridLayout gridLayout) {
         gridLayout.setColumnCount(gridColCount);
         gridLayout.setRowCount(gridRowCount);
         gridLayout.getLayoutParams().width = screenWidth;
         gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
+    }
 
-        // For each cell, create image view with random gem img
+    private void initBoardGems (GridLayout gridLayout) {
         for (int i = 0; i < gridColCount * gridRowCount; i++)
         {
             ImageView imageView = new ImageView(this);
             imageView.setId(i);
+            // Set imageView Size
             imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth));
             imageView.setMaxHeight(cellWidth);
             imageView.setMaxWidth(cellWidth);
+            // Random int
             int randomGem = (int) Math.floor(Math.random() * gems.length);
+            // display gem
             imageView.setImageResource(gems[randomGem]);
             gridLayout.addView(imageView);
         }
