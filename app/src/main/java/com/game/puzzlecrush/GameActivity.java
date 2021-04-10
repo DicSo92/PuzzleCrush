@@ -6,6 +6,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -13,9 +14,11 @@ import android.widget.Chronometer;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity {
     private ImageButton pauseBtn;
@@ -23,8 +26,14 @@ public class GameActivity extends AppCompatActivity {
     private GridLayout gridLayout;
 
     private Chronometer chronometer;
-    private boolean runningChrono;
+    private boolean chronoRunning;
     private long pauseOffset;
+
+    private CountDownTimer countDownTimer;
+    private TextView textViewCountDown;
+    private static final long START_TIME = 60 * 1000;
+    private long TIME_LEFT = START_TIME;
+    private boolean countDownRunning;
 
     ArrayList<ImageView> gemList = new ArrayList<>();
     private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
@@ -56,36 +65,75 @@ public class GameActivity extends AppCompatActivity {
 
         // Init Chronometer
         this.chronometer = findViewById(R.id.chronometer);
-        startChronometer(chronometer);
+        startChronometer();
         // Reset timer after 30 seconds (feature test)
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
                 if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 30 * 1000) {
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    Toast.makeText(GameActivity.this, "Reset Timer !", Toast.LENGTH_SHORT).show();
+                    resetChronometer();
                 }
             }
         });
+
+        this.textViewCountDown = findViewById(R.id.countdown);
+        startTimer();
+    }
+    public void startTimer () {
+        if (!countDownRunning) {
+            countDownTimer = new CountDownTimer(TIME_LEFT, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    TIME_LEFT = millisUntilFinished;
+                    updateCountDownText();
+                }
+                @Override
+                public void onFinish() {
+                    countDownRunning = false;
+                    resetTimer();
+                    startTimer();
+                }
+            }.start();
+            countDownRunning = true;
+        }
+    }
+    public void pauseTimer () {
+        if (countDownRunning) {
+            countDownTimer.cancel();
+            countDownRunning = false;
+        }
+    }
+    public void resetTimer () {
+        TIME_LEFT = START_TIME;
+        updateCountDownText();
+        Toast.makeText(GameActivity.this, "Reset Timer !", Toast.LENGTH_SHORT).show();
+    }
+    private void updateCountDownText () {
+        int minutes = (int) (TIME_LEFT / 1000) / 60;
+        int seconds = (int) (TIME_LEFT / 1000) % 60;
+
+        String formatedTimeLeft = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
+        textViewCountDown.setText(formatedTimeLeft);
     }
 
-    public void startChronometer (View v) {
-        if (!runningChrono) {
+    public void startChronometer () {
+        if (!chronoRunning) {
             chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
             chronometer.start();
-            runningChrono = true;
+            chronoRunning = true;
         }
     }
-    public void pauseChronometer (View v) {
-        if (runningChrono) {
+    public void pauseChronometer () {
+        if (chronoRunning) {
             chronometer.stop();
             pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
-            runningChrono = false;
+            chronoRunning = false;
         }
     }
-    public void resetChronometer (View v) {
+    public void resetChronometer () {
         chronometer.setBase(SystemClock.elapsedRealtime());
         pauseOffset = 0;
+        Toast.makeText(GameActivity.this, "Reset Chronometer !", Toast.LENGTH_SHORT).show();
     }
 
     private void initGrid () {
@@ -95,7 +143,6 @@ public class GameActivity extends AppCompatActivity {
         gridLayout.getLayoutParams().width = screenWidth;
         gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
     }
-
     private void initBoardGems () {
         for (int i = 0; i < gridColCount * gridRowCount; i++)
         {
@@ -153,13 +200,15 @@ public class GameActivity extends AppCompatActivity {
                 // Init new Popup (PausePopup Class)
                 final PausePopup pausePopup = new PausePopup(activity);
 
-                // Pause Chronometer
-                pauseChronometer(chronometer);
-                // Cancel popup listener to restart chronometer
+                // Pause Timer/Chronometer
+                pauseTimer();
+                pauseChronometer();
+                // Cancel popup listener to restart timer/chronometer
                 pausePopup.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        startChronometer(chronometer); // restart chronometer
+                        startTimer(); // restart timer
+                        startChronometer(); // restart chronometer
                     }
                 });
 
@@ -167,7 +216,8 @@ public class GameActivity extends AppCompatActivity {
                 pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startChronometer(chronometer); // restart chronometer
+                        startTimer(); // restart timer
+                        startChronometer(); // restart chronometer
                         pausePopup.dismiss();
                     }
                 });

@@ -18,19 +18,34 @@
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
+        android:id="@+id/waveText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wave 1"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="28sp"
+        android:textStyle="bold"
+
+        android:layout_marginTop="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/countdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="00:00"
-        android:textColor="@android:color/white"
-        android:textSize="30sp"
-        android:textStyle="bold"
-
         android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/waveText" />
 
     <ImageButton
         android:id="@+id/pauseBtn"
