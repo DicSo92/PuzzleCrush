@@ -2,6 +2,7 @@ package com.game.puzzlecrush;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.widget.GridLayout;
@@ -24,6 +25,7 @@ public class GameActivity extends AppCompatActivity {
     ArrayList<ImageView> gemList = new ArrayList<>();
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,25 +49,22 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
-                    Toast.makeText(MainActivity.this, "Left", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameActivity.this, "Left", Toast.LENGTH_SHORT).show();
                 }
-
                 @Override
                 void swipeRight() {
                     super.swipeRight();
-                    Toast.makeText(MainActivity.this, "Right", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameActivity.this, "Right", Toast.LENGTH_SHORT).show();
                 }
-
                 @Override
                 void swipeTop() {
                     super.swipeTop();
-                    Toast.makeText(MainActivity.this, "Top", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameActivity.this, "Top", Toast.LENGTH_SHORT).show();
                 }
-
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
-                    Toast.makeText(MainActivity.this, "Bottom", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GameActivity.this, "Bottom", Toast.LENGTH_SHORT).show();
                 }
             });
         }
