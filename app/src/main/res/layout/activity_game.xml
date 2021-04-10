@@ -9,9 +9,48 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/landscape_3"
-        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:scaleType="fitXY" />
+        android:layout_centerVertical="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/landscape_3"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+<!--    <GridLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:background="#8800"-->
+<!--        android:id="@+id/gemGrid" />-->
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gemGrid"
+        android:background="#8800"
+
+        android:layout_marginTop="300dp"
+        android:layout_marginBottom="150dp"
+
+        android:columnCount="7"
+        android:rowCount="5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+    </GridLayout>
+
+    <androidx.gridlayout.widget.GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="590sp"
+        android:background="#006644"
+
+        app:columnCount="5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </androidx.gridlayout.widget.GridLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
