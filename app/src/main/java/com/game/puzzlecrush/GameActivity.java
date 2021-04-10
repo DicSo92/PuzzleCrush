@@ -3,15 +3,20 @@ package com.game.puzzlecrush;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class GameActivity extends AppCompatActivity {
+    private ImageButton pauseBtn;
+    private GameActivity activity;
 
     private int[] gems = {
             R.drawable.gem_blue,
@@ -30,6 +35,8 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        this.activity = this;
 
         // Get Screen dimensions for responsive
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -68,6 +75,31 @@ public class GameActivity extends AppCompatActivity {
                 }
             });
         }
+
+        pauseBtn = findViewById(R.id.pauseBtn);
+        pauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final PausePopup pausePopup = new PausePopup(activity);
+
+                pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pausePopup.dismiss();
+                    }
+                });
+                pausePopup.getBtn_backMenu().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent newMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(newMainActivity);
+                        finish();
+                        pausePopup.dismiss();
+                    }
+                });
+                pausePopup.Build();
+            }
+        });
     }
 
     private void setGridParams (GridLayout gridLayout) {
