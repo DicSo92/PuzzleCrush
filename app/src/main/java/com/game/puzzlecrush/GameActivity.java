@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class GameActivity extends AppCompatActivity {
     private ImageButton pauseBtn;
     private GameActivity activity;
+    private GridLayout gridLayout;
 
     private int[] gems = {
             R.drawable.gem_blue,
@@ -29,8 +30,6 @@ public class GameActivity extends AppCompatActivity {
     private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
     ArrayList<ImageView> gemList = new ArrayList<>();
 
-
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,12 +43,45 @@ public class GameActivity extends AppCompatActivity {
         screenWidth = displayMetrics.widthPixels;
         cellWidth = screenWidth / gridColCount;
 
-        GridLayout gridLayout = findViewById(R.id.gemGrid); // Get grid
+        initGrid(); // Set grid col/row/size
 
-        setGridParams(gridLayout); // Set grid col/row/size
+        initBoardGems(); // For each cell, create image view with random gem img
 
-        initBoardGems(gridLayout); // For each cell, create image view with random gem img
+        initGemsSwipeListener();
 
+        initPausePopupListeners();
+    }
+
+    private void initGrid () {
+        this.gridLayout = findViewById(R.id.gemGrid); // Get grid
+        gridLayout.setColumnCount(gridColCount);
+        gridLayout.setRowCount(gridRowCount);
+        gridLayout.getLayoutParams().width = screenWidth;
+        gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
+    }
+
+    private void initBoardGems () {
+        for (int i = 0; i < gridColCount * gridRowCount; i++)
+        {
+            ImageView imageView = new ImageView(this);
+            imageView.setId(i);
+            // Set imageView Size
+            imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth));
+            imageView.setMaxHeight(cellWidth);
+            imageView.setMaxWidth(cellWidth);
+            // Set ImageView padding
+            imageView.setPadding(10,10,10,10);
+            // Random int
+            int randomGem = (int) Math.floor(Math.random() * gems.length);
+            // display gem
+            imageView.setImageResource(gems[randomGem]);
+            gemList.add(imageView);
+            gridLayout.addView(imageView);
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initGemsSwipeListener () {
         for (ImageView imageView : gemList) {
             imageView.setOnTouchListener(new OnGemSwipe(this)
             {
@@ -75,13 +107,16 @@ public class GameActivity extends AppCompatActivity {
                 }
             });
         }
+    }
 
-        pauseBtn = findViewById(R.id.pauseBtn);
+    private void initPausePopupListeners() {
+        this.pauseBtn = findViewById(R.id.pauseBtn); // Get pauseBtn
         pauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final PausePopup pausePopup = new PausePopup(activity);
 
+                // On click
                 pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -100,32 +135,5 @@ public class GameActivity extends AppCompatActivity {
                 pausePopup.Build();
             }
         });
-    }
-
-    private void setGridParams (GridLayout gridLayout) {
-        gridLayout.setColumnCount(gridColCount);
-        gridLayout.setRowCount(gridRowCount);
-        gridLayout.getLayoutParams().width = screenWidth;
-        gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
-    }
-
-    private void initBoardGems (GridLayout gridLayout) {
-        for (int i = 0; i < gridColCount * gridRowCount; i++)
-        {
-            ImageView imageView = new ImageView(this);
-            imageView.setId(i);
-            // Set imageView Size
-            imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth));
-            imageView.setMaxHeight(cellWidth);
-            imageView.setMaxWidth(cellWidth);
-            // Set ImageView padding
-            imageView.setPadding(10,10,10,10);
-            // Random int
-            int randomGem = (int) Math.floor(Math.random() * gems.length);
-            // display gem
-            imageView.setImageResource(gems[randomGem]);
-            gemList.add(imageView);
-            gridLayout.addView(imageView);
-        }
     }
 }
