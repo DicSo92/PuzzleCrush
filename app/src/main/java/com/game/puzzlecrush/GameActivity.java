@@ -37,6 +37,7 @@ public class GameActivity extends AppCompatActivity {
 
     ArrayList<ImageView> gemList = new ArrayList<>();
     private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
+    int gemToBeDragged, gemToBeReplaced;
     private int[] gems = {
             R.drawable.gem_blue,
             R.drawable.gem_green,
@@ -79,6 +80,7 @@ public class GameActivity extends AppCompatActivity {
         this.textViewCountDown = findViewById(R.id.countdown);
         startTimer();
     }
+
     public void startTimer () {
         if (!countDownRunning) {
             countDownTimer = new CountDownTimer(TIME_LEFT, 1000) {
@@ -158,6 +160,7 @@ public class GameActivity extends AppCompatActivity {
             int randomGem = (int) Math.floor(Math.random() * gems.length);
             // display gem
             imageView.setImageResource(gems[randomGem]);
+            imageView.setTag(gems[randomGem]);
             gemList.add(imageView);
             gridLayout.addView(imageView);
         }
@@ -165,31 +168,52 @@ public class GameActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initGemsSwipeListener () {
-        for (ImageView imageView : gemList) {
+        for (final ImageView imageView : gemList) {
             imageView.setOnTouchListener(new OnGemSwipe(this)
             {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
                     Toast.makeText(GameActivity.this, "Left", Toast.LENGTH_SHORT).show();
+                    gemToBeDragged = imageView.getId();
+                    gemToBeReplaced = gemToBeDragged - 1;
+                    gemInterchange();
+
                 }
                 @Override
                 void swipeRight() {
                     super.swipeRight();
                     Toast.makeText(GameActivity.this, "Right", Toast.LENGTH_SHORT).show();
+                    gemToBeDragged = imageView.getId();
+                    gemToBeReplaced = gemToBeDragged + 1;
+                    gemInterchange();
                 }
                 @Override
                 void swipeTop() {
                     super.swipeTop();
                     Toast.makeText(GameActivity.this, "Top", Toast.LENGTH_SHORT).show();
+                    gemToBeDragged = imageView.getId();
+                    gemToBeReplaced = gemToBeDragged - gridColCount;
+                    gemInterchange();
                 }
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
                     Toast.makeText(GameActivity.this, "Bottom", Toast.LENGTH_SHORT).show();
+                    gemToBeDragged = imageView.getId();
+                    gemToBeReplaced = gemToBeDragged + gridColCount;
+                    gemInterchange();
                 }
             });
         }
+    }
+    private void gemInterchange () {
+        int replacedGem = (int) gemList.get(gemToBeReplaced).getTag();
+        int draggedGem = (int) gemList.get(gemToBeDragged).getTag();
+        gemList.get(gemToBeDragged).setImageResource(replacedGem);
+        gemList.get(gemToBeReplaced).setImageResource(draggedGem);
+        gemList.get(gemToBeDragged).setTag(replacedGem);
+        gemList.get(gemToBeReplaced).setTag(draggedGem);
     }
 
     private void initPausePopupListeners() {
