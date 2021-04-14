@@ -2,6 +2,8 @@ package com.game.puzzlecrush;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -37,7 +39,7 @@ public class GameActivity extends AppCompatActivity {
 
     ArrayList<ImageView> gemList = new ArrayList<>();
     private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
-    int gemToBeDragged, gemToBeReplaced;
+    int gemBeingDragged, gemBeingReplaced;
     private int[] gems = {
             R.drawable.gem_blue,
             R.drawable.gem_green,
@@ -175,8 +177,8 @@ public class GameActivity extends AppCompatActivity {
                 void swipeLeft() {
                     super.swipeLeft();
                     Toast.makeText(GameActivity.this, "Left", Toast.LENGTH_SHORT).show();
-                    gemToBeDragged = imageView.getId();
-                    gemToBeReplaced = gemToBeDragged - 1;
+                    gemBeingDragged = imageView.getId();
+                    gemBeingReplaced = gemBeingDragged - 1;
                     gemInterchange();
 
                 }
@@ -184,36 +186,43 @@ public class GameActivity extends AppCompatActivity {
                 void swipeRight() {
                     super.swipeRight();
                     Toast.makeText(GameActivity.this, "Right", Toast.LENGTH_SHORT).show();
-                    gemToBeDragged = imageView.getId();
-                    gemToBeReplaced = gemToBeDragged + 1;
+                    gemBeingDragged = imageView.getId();
+                    gemBeingReplaced = gemBeingDragged + 1;
                     gemInterchange();
                 }
                 @Override
                 void swipeTop() {
                     super.swipeTop();
                     Toast.makeText(GameActivity.this, "Top", Toast.LENGTH_SHORT).show();
-                    gemToBeDragged = imageView.getId();
-                    gemToBeReplaced = gemToBeDragged - gridColCount;
+                    gemBeingDragged = imageView.getId();
+                    gemBeingReplaced = gemBeingDragged - gridColCount;
                     gemInterchange();
                 }
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
-                    Toast.makeText(GameActivity.this, "Bottom", Toast.LENGTH_SHORT).show();
-                    gemToBeDragged = imageView.getId();
-                    gemToBeReplaced = gemToBeDragged + gridColCount;
+                    Toast.makeText(GameActivity.this, "Bottom"+imageView.getId(), Toast.LENGTH_SHORT).show();
+                    gemBeingDragged = imageView.getId();
+                    gemBeingReplaced = gemBeingDragged + gridColCount;
                     gemInterchange();
                 }
             });
         }
     }
     private void gemInterchange () {
-        int replacedGem = (int) gemList.get(gemToBeReplaced).getTag();
-        int draggedGem = (int) gemList.get(gemToBeDragged).getTag();
-        gemList.get(gemToBeDragged).setImageResource(replacedGem);
-        gemList.get(gemToBeReplaced).setImageResource(draggedGem);
-        gemList.get(gemToBeDragged).setTag(replacedGem);
-        gemList.get(gemToBeReplaced).setTag(draggedGem);
+//        ObjectAnimator animator = ObjectAnimator.ofFloat(gemList.get(gemBeingDragged), "x", cellWidth);
+//        animator.setDuration(1000);
+//        AnimatorSet animatorSet = new AnimatorSet();
+//        animatorSet.playTogether(animator);
+//        animatorSet.start();
+
+
+        int replacedGem = (int) gemList.get(gemBeingReplaced).getTag();
+        int draggedGem = (int) gemList.get(gemBeingDragged).getTag();
+        gemList.get(gemBeingDragged).setImageResource(replacedGem);
+        gemList.get(gemBeingReplaced).setImageResource(draggedGem);
+        gemList.get(gemBeingDragged).setTag(replacedGem);
+        gemList.get(gemBeingReplaced).setTag(draggedGem);
     }
 
     private void initPausePopupListeners() {
