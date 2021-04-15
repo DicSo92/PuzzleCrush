@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
-public class GemCell extends NewActivity{
+public class GemCell extends GameActivity{
     private int x, y, id;
     private ImageView imageView;
 

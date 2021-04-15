@@ -2,6 +2,8 @@ package com.game.puzzlecrush;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -16,10 +18,15 @@ import android.widget.Chronometer;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity {
@@ -37,16 +44,18 @@ public class GameActivity extends AppCompatActivity {
     private long TIME_LEFT = START_TIME;
     private boolean countDownRunning;
 
-    ArrayList<ImageView> gemList = new ArrayList<>();
-    private int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
-    int gemBeingDragged, gemBeingReplaced;
-    private int[] gems = {
+    public static int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
+    GemCell gemCellBeingDragged, gemCellBeingReplaced;
+    public static int[] gems = {
             R.drawable.gem_blue,
             R.drawable.gem_green,
             R.drawable.gem_purple,
             R.drawable.gem_red,
             R.drawable.gem_yellow,
     };
+    private RelativeLayout relativeLayout;
+    HashMap<List<Integer>, GemCell> gemCellList = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +150,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initGrid () {
+        this.relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         this.gridLayout = findViewById(R.id.gemGrid); // Get grid
         gridLayout.setColumnCount(gridColCount);
         gridLayout.setRowCount(gridRowCount);
@@ -148,81 +158,112 @@ public class GameActivity extends AppCompatActivity {
         gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
     }
     private void initBoardGems () {
-        for (int i = 0; i < gridColCount * gridRowCount; i++)
-        {
-            ImageView imageView = new ImageView(this);
-            imageView.setId(i);
-            // Set imageView Size
-            imageView.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth));
-            imageView.setMaxHeight(cellWidth);
-            imageView.setMaxWidth(cellWidth);
-            // Set ImageView padding
-            imageView.setPadding(10,10,10,10);
-            // Random int
-            int randomGem = (int) Math.floor(Math.random() * gems.length);
-            // display gem
-            imageView.setImageResource(gems[randomGem]);
-            imageView.setTag(gems[randomGem]);
-            gemList.add(imageView);
-            gridLayout.addView(imageView);
+        for (int r=0; r < gridRowCount; r++) {
+            for (int c=0; c < gridColCount; c++) {
+                ImageView imageView = new ImageView(this);
+                imageView.setVisibility(View.VISIBLE);
+                GemCell gemCell = new GemCell(r, c, imageView);
+
+                gridLayout.addView(gemCell.getImageView());
+
+                gemCellList.put(Collections.unmodifiableList(Arrays.asList(r, c)), gemCell);
+            }
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private void initGemsSwipeListener () {
-        for (final ImageView imageView : gemList) {
+        for (final GemCell gemCell : gemCellList.values()) {
+            ImageView imageView = gemCell.getImageView();
+
             imageView.setOnTouchListener(new OnGemSwipe(this)
             {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
-                    Toast.makeText(GameActivity.this, "Left", Toast.LENGTH_SHORT).show();
-                    gemBeingDragged = imageView.getId();
-                    gemBeingReplaced = gemBeingDragged - 1;
-                    gemInterchange();
-
+                    initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
                 }
+
                 @Override
                 void swipeRight() {
                     super.swipeRight();
-                    Toast.makeText(GameActivity.this, "Right", Toast.LENGTH_SHORT).show();
-                    gemBeingDragged = imageView.getId();
-                    gemBeingReplaced = gemBeingDragged + 1;
-                    gemInterchange();
+                    initInterchange("Right", gemCell.getX(), gemCell.getY() + 1, "translationX", 1, gemCell);
                 }
                 @Override
                 void swipeTop() {
                     super.swipeTop();
-                    Toast.makeText(GameActivity.this, "Top", Toast.LENGTH_SHORT).show();
-                    gemBeingDragged = imageView.getId();
-                    gemBeingReplaced = gemBeingDragged - gridColCount;
-                    gemInterchange();
+                    initInterchange("Top", gemCell.getX() - 1, gemCell.getY(), "translationY", -1, gemCell);
                 }
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
-                    Toast.makeText(GameActivity.this, "Bottom"+imageView.getId(), Toast.LENGTH_SHORT).show();
-                    gemBeingDragged = imageView.getId();
-                    gemBeingReplaced = gemBeingDragged + gridColCount;
-                    gemInterchange();
+                    initInterchange("Bottom", gemCell.getX() + 1, gemCell.getY(), "translationY", 1, gemCell);
                 }
             });
         }
     }
-    private void gemInterchange () {
-//        ObjectAnimator animator = ObjectAnimator.ofFloat(gemList.get(gemBeingDragged), "x", cellWidth);
-//        animator.setDuration(1000);
-//        AnimatorSet animatorSet = new AnimatorSet();
-//        animatorSet.playTogether(animator);
-//        animatorSet.start();
+    private void initInterchange(String direction, int x, int y, String translationX, int positive, GemCell gemCell) {
+        Toast.makeText(GameActivity.this, direction, Toast.LENGTH_SHORT).show();
+
+        if (gemCellList.containsKey(Arrays.asList(x, y))) {
+            gemCellBeingDragged = gemCell;
+            gemCellBeingReplaced = gemCellList.get(Arrays.asList(x, y));
+            gemInterchange(translationX, positive);
+        }
+    }
+    private void createGemToAnimate () {
+
+    }
+    private void gemInterchange (String direction, int positive) {
+        final ImageView animateGemDragged = new ImageView(this);
+        animateGemDragged.setPadding(10,10,10,10);
+        animateGemDragged.setImageResource((int) gemCellBeingDragged.getImageView().getTag());
+        RelativeLayout.LayoutParams dragLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+        dragLayout.leftMargin = gemCellBeingDragged.getImageView().getLeft();
+        dragLayout.topMargin = gemCellBeingDragged.getImageView().getTop();
+        relativeLayout.addView(animateGemDragged, dragLayout);
+
+        ObjectAnimator animatorDragged;
+        animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
+        animatorDragged.setDuration(500);
 
 
-        int replacedGem = (int) gemList.get(gemBeingReplaced).getTag();
-        int draggedGem = (int) gemList.get(gemBeingDragged).getTag();
-        gemList.get(gemBeingDragged).setImageResource(replacedGem);
-        gemList.get(gemBeingReplaced).setImageResource(draggedGem);
-        gemList.get(gemBeingDragged).setTag(replacedGem);
-        gemList.get(gemBeingReplaced).setTag(draggedGem);
+        final ImageView animateGemReplaced = new ImageView(this);
+        animateGemReplaced.setPadding(10,10,10,10);
+        animateGemReplaced.setImageResource((int) gemCellBeingReplaced.getImageView().getTag());
+        RelativeLayout.LayoutParams replaceLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+        replaceLayout.leftMargin = gemCellBeingReplaced.getImageView().getLeft();
+        replaceLayout.topMargin = gemCellBeingReplaced.getImageView().getTop();
+        relativeLayout.addView(animateGemReplaced, replaceLayout);
+
+        ObjectAnimator animatorReplaced;
+        animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
+        animatorReplaced.setDuration(500);
+
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorDragged, animatorReplaced);
+        animatorSet.start();
+
+        gemCellBeingReplaced.getImageView().setVisibility(View.INVISIBLE);
+        gemCellBeingDragged.getImageView().setVisibility(View.INVISIBLE);
+
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                relativeLayout.removeView(animateGemDragged);
+                relativeLayout.removeView(animateGemReplaced);
+
+
+                int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
+                int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
+                gemCellBeingDragged.updateImageView(replacedGem);
+                gemCellBeingReplaced.updateImageView(draggedGem);
+            }
+        });
     }
 
     private void initPausePopupListeners() {

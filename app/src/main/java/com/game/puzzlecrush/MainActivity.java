@@ -27,17 +27,5 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
-        this.testGame = (Button) findViewById(R.id.btn_test);
-        testGame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent newTestActivity = new Intent(getApplicationContext(), NewActivity.class);
-                startActivity(newTestActivity);
-                finish();
-            }
-        });
-
     }
 }

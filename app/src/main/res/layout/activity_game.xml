@@ -94,87 +94,28 @@
 
         android:background="#35880000"
         app:columnCount="7"
-        app:layout_constraintBottom_toTopOf="@+id/gemGrid"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topComponents">
     </androidx.gridlayout.widget.GridLayout>
 
-    <GridLayout
-        android:id="@+id/gemGrid"
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="300sp"
-        android:background="#66000000"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/heroLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-    </GridLayout>
+        <GridLayout
+            android:id="@+id/gemGrid"
+            android:layout_width="match_parent"
+            android:layout_height="300sp"
+            android:background="#66000000">
+        </GridLayout>
+    </RelativeLayout>
 
-<!--    <androidx.gridlayout.widget.GridLayout-->
-<!--        android:id="@+id/heroGrid"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="100sp"-->
-
-<!--        android:background="#66006644"-->
-<!--        app:columnCount="5"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent">-->
-
-<!--        <ImageButton-->
-<!--            app:srcCompat="@drawable/hero_purple"-->
-<!--            android:id="@+id/heroPurple"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_column="0"-->
-<!--            app:layout_row="0"-->
-<!--            android:scaleType="fitCenter"-->
-<!--            android:adjustViewBounds="true"-->
-<!--        />-->
-
-<!--        <ImageButton-->
-<!--            app:srcCompat="@drawable/hero_yellow"-->
-<!--            android:id="@+id/heroYellow"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_column="1"-->
-<!--            app:layout_row="0"-->
-<!--            android:scaleType="fitCenter"-->
-<!--            android:adjustViewBounds="true"-->
-<!--        />-->
-<!--        <ImageButton-->
-<!--            app:srcCompat="@drawable/hero_red"-->
-<!--            android:id="@+id/heroRed"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_column="2"-->
-<!--            app:layout_row="0"-->
-<!--            android:scaleType="fitCenter"-->
-<!--            android:adjustViewBounds="true"-->
-<!--        />-->
-<!--        <ImageButton-->
-<!--            app:srcCompat="@drawable/hero_green"-->
-<!--            android:id="@+id/heroGreen"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_column="3"-->
-<!--            app:layout_row="0"-->
-<!--            android:scaleType="fitCenter"-->
-<!--            android:adjustViewBounds="true"-->
-<!--        />-->
-<!--        <ImageButton-->
-<!--            app:srcCompat="@drawable/hero_blue"-->
-<!--            android:id="@+id/heroBlue"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_column="4"-->
-<!--            app:layout_row="0"-->
-<!--            android:scaleType="fitCenter"-->
-<!--            android:adjustViewBounds="true"-->
-<!--        />-->
-
-<!--    </androidx.gridlayout.widget.GridLayout>-->
 
     <LinearLayout
         android:id="@+id/heroLayout"
