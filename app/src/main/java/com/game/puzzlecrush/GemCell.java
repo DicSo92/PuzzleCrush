@@ -1,5 +1,6 @@
 package com.game.puzzlecrush;
 
+import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 
@@ -28,9 +29,11 @@ public class GemCell extends NewActivity{
     public int getX() {
         return x;
     }
+
     public int getY() {
         return y;
     }
+
     public ImageView getImageView() {
         return this.imageView;
     }
@@ -38,8 +41,10 @@ public class GemCell extends NewActivity{
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
     }
+
     public void updateImageView(int gem) {
         this.imageView.setImageResource(gem);
         this.imageView.setTag(gem);
+        this.imageView.setVisibility(View.VISIBLE);
     }
 }

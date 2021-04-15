@@ -1,11 +1,17 @@
 package com.game.puzzlecrush;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +36,7 @@ public class NewActivity extends AppCompatActivity  {
 
 
     ArrayList<GemCell> gemCellList = new ArrayList<>();
+    private RelativeLayout relativeLayout;
 
 
     @Override
@@ -53,6 +60,7 @@ public class NewActivity extends AppCompatActivity  {
     }
 
     private void initGrid () {
+        this.relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         this.gridLayout = findViewById(R.id.gemGrid); // Get grid
         gridLayout.setColumnCount(gridColCount);
         gridLayout.setRowCount(gridRowCount);
@@ -64,6 +72,7 @@ public class NewActivity extends AppCompatActivity  {
         for (int r=0; r < gridRowCount; r++) {
             for (int c=0; c < gridColCount; c++) {
                 ImageView imageView = new ImageView(this);
+                imageView.setVisibility(View.VISIBLE);
                 GemCell gemCell = new GemCell(r, c, imageView);
 
                 gridLayout.addView(gemCell.getImageView());
@@ -87,7 +96,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() && gemCellR.getY() == gemCell.getY() - 1) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange();
+                            gemInterchange("translationX", false);
                             break;
                         }
                     }
@@ -100,7 +109,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() && gemCellR.getY() == gemCell.getY() + 1) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange();
+                            gemInterchange("translationX", true);
                             break;
                         }
                     }
@@ -113,7 +122,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() - 1 && gemCellR.getY() == gemCell.getY()) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange();
+                            gemInterchange("translationY", false);
                             break;
                         }
                     }
@@ -126,7 +135,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() + 1 && gemCellR.getY() == gemCell.getY()) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange();
+                            gemInterchange("translationY", true);
                             break;
                         }
                     }
@@ -134,16 +143,53 @@ public class NewActivity extends AppCompatActivity  {
             });
         }
     }
-    private void gemInterchange () {
-//        ObjectAnimator animator = ObjectAnimator.ofFloat(gemList.get(gemCellBeingDragged), "x", cellWidth);
-//        animator.setDuration(1000);
-//        AnimatorSet animatorSet = new AnimatorSet();
-//        animatorSet.playTogether(animator);
-//        animatorSet.start();
+    private void gemInterchange (String direction, boolean positive) {
+        final ImageView animateGemDragged = new ImageView(this);
+        animateGemDragged.setPadding(10,10,10,10);
+        animateGemDragged.setImageResource((int) gemCellBeingDragged.getImageView().getTag());
+        RelativeLayout.LayoutParams dragLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+        dragLayout.leftMargin = gemCellBeingDragged.getImageView().getLeft();
+        dragLayout.topMargin = gemCellBeingDragged.getImageView().getTop();
+        relativeLayout.addView(animateGemDragged, dragLayout);
 
-        int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
-        int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
-        gemCellBeingDragged.updateImageView(replacedGem);
-        gemCellBeingReplaced.updateImageView(draggedGem);
+        final ImageView animateGemReplaced = new ImageView(this);
+        animateGemReplaced.setPadding(10,10,10,10);
+        animateGemReplaced.setImageResource((int) gemCellBeingReplaced.getImageView().getTag());
+        RelativeLayout.LayoutParams replaceLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+        replaceLayout.leftMargin = gemCellBeingReplaced.getImageView().getLeft();
+        replaceLayout.topMargin = gemCellBeingReplaced.getImageView().getTop();
+        relativeLayout.addView(animateGemReplaced, replaceLayout);
+
+
+        ObjectAnimator animatorDragged;
+        animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive ? + cellWidth : - cellWidth);
+        animatorDragged.setDuration(500);
+
+        ObjectAnimator animatorReplaced;
+        animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, !positive ? + cellWidth : - cellWidth);
+        animatorReplaced.setDuration(500);
+
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animatorDragged, animatorReplaced);
+        animatorSet.start();
+
+        gemCellBeingReplaced.getImageView().setVisibility(View.INVISIBLE);
+        gemCellBeingDragged.getImageView().setVisibility(View.INVISIBLE);
+
+
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                animateGemDragged.setVisibility(View.INVISIBLE);
+                animateGemReplaced.setVisibility(View.INVISIBLE);
+
+                int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
+                int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
+                gemCellBeingDragged.updateImageView(replacedGem);
+                gemCellBeingReplaced.updateImageView(draggedGem);
+            }
+        });
     }
 }
