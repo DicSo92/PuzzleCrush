@@ -103,7 +103,6 @@ public class GameActivity extends AppCompatActivity {
                     super.swipeLeft();
                     initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
                 }
-
                 @Override
                 void swipeRight() {
                     super.swipeRight();
@@ -137,14 +136,10 @@ public class GameActivity extends AppCompatActivity {
         final ImageView animateGemDragged = createGemToAnimate(gemCellBeingDragged);
         final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
 
-        ObjectAnimator animatorDragged;
-        animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
+        ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
         animatorDragged.setDuration(500);
-
-        ObjectAnimator animatorReplaced;
-        animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
+        ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
         animatorReplaced.setDuration(500);
-
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animatorDragged, animatorReplaced);
