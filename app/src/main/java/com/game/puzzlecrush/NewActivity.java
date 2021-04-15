@@ -96,7 +96,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() && gemCellR.getY() == gemCell.getY() - 1) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange("translationX", false);
+                            gemInterchange("translationX", -1);
                             break;
                         }
                     }
@@ -109,7 +109,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() && gemCellR.getY() == gemCell.getY() + 1) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange("translationX", true);
+                            gemInterchange("translationX", 1);
                             break;
                         }
                     }
@@ -122,7 +122,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() - 1 && gemCellR.getY() == gemCell.getY()) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange("translationY", false);
+                            gemInterchange("translationY", -1);
                             break;
                         }
                     }
@@ -135,7 +135,7 @@ public class NewActivity extends AppCompatActivity  {
                     for (GemCell gemCellR : gemCellList) {
                         if (gemCellR.getX() ==  gemCell.getX() + 1 && gemCellR.getY() == gemCell.getY()) {
                             gemCellBeingReplaced = gemCellR;
-                            gemInterchange("translationY", true);
+                            gemInterchange("translationY", 1);
                             break;
                         }
                     }
@@ -143,7 +143,7 @@ public class NewActivity extends AppCompatActivity  {
             });
         }
     }
-    private void gemInterchange (String direction, boolean positive) {
+    private void gemInterchange (String direction, int positive) {
         final ImageView animateGemDragged = new ImageView(this);
         animateGemDragged.setPadding(10,10,10,10);
         animateGemDragged.setImageResource((int) gemCellBeingDragged.getImageView().getTag());
@@ -162,11 +162,11 @@ public class NewActivity extends AppCompatActivity  {
 
 
         ObjectAnimator animatorDragged;
-        animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive ? + cellWidth : - cellWidth);
+        animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
         animatorDragged.setDuration(500);
 
         ObjectAnimator animatorReplaced;
-        animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, !positive ? + cellWidth : - cellWidth);
+        animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
         animatorReplaced.setDuration(500);
 
         AnimatorSet animatorSet = new AnimatorSet();
@@ -182,8 +182,9 @@ public class NewActivity extends AppCompatActivity  {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
 
-                animateGemDragged.setVisibility(View.INVISIBLE);
-                animateGemReplaced.setVisibility(View.INVISIBLE);
+                relativeLayout.removeView(animateGemDragged);
+                relativeLayout.removeView(animateGemReplaced);
+
 
                 int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
                 int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
