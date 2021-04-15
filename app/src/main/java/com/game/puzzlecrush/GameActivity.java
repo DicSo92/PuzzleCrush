@@ -211,30 +211,13 @@ public class GameActivity extends AppCompatActivity {
             gemInterchange(translationX, positive);
         }
     }
-    private void createGemToAnimate () {
-
-    }
     private void gemInterchange (String direction, int positive) {
-        final ImageView animateGemDragged = new ImageView(this);
-        animateGemDragged.setPadding(10,10,10,10);
-        animateGemDragged.setImageResource((int) gemCellBeingDragged.getImageView().getTag());
-        RelativeLayout.LayoutParams dragLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
-        dragLayout.leftMargin = gemCellBeingDragged.getImageView().getLeft();
-        dragLayout.topMargin = gemCellBeingDragged.getImageView().getTop();
-        relativeLayout.addView(animateGemDragged, dragLayout);
+        final ImageView animateGemDragged = createGemToAnimate(gemCellBeingDragged);
+        final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
 
         ObjectAnimator animatorDragged;
         animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
         animatorDragged.setDuration(500);
-
-
-        final ImageView animateGemReplaced = new ImageView(this);
-        animateGemReplaced.setPadding(10,10,10,10);
-        animateGemReplaced.setImageResource((int) gemCellBeingReplaced.getImageView().getTag());
-        RelativeLayout.LayoutParams replaceLayout = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
-        replaceLayout.leftMargin = gemCellBeingReplaced.getImageView().getLeft();
-        replaceLayout.topMargin = gemCellBeingReplaced.getImageView().getTop();
-        relativeLayout.addView(animateGemReplaced, replaceLayout);
 
         ObjectAnimator animatorReplaced;
         animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
@@ -264,6 +247,17 @@ public class GameActivity extends AppCompatActivity {
                 gemCellBeingReplaced.updateImageView(draggedGem);
             }
         });
+    }
+
+    private ImageView createGemToAnimate(GemCell gemCellToDuplicate) {
+        final ImageView animateGem = new ImageView(this);
+        animateGem.setPadding(10, 10, 10, 10);
+        animateGem.setImageResource((int) gemCellToDuplicate.getImageView().getTag());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+        params.leftMargin = gemCellToDuplicate.getImageView().getLeft();
+        params.topMargin = gemCellToDuplicate.getImageView().getTop();
+        relativeLayout.addView(animateGem, params);
+        return animateGem;
     }
 
     private void initPausePopupListeners() {
