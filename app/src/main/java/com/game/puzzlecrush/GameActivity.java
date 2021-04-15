@@ -33,16 +33,10 @@ public class GameActivity extends AppCompatActivity {
     private ImageButton pauseBtn;
     private GameActivity activity;
     private GridLayout gridLayout;
+    private RelativeLayout relativeLayout;
 
-    private Chronometer chronometer;
-    private boolean chronoRunning;
-    private long pauseOffset;
-
-    private CountDownTimer countDownTimer;
-    private TextView textViewCountDown;
-    private static final long START_TIME = 60 * 1000;
-    private long TIME_LEFT = START_TIME;
-    private boolean countDownRunning;
+    GameChronometer gameChronometer;
+    GameTimer gameTimer;
 
     public static int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
     GemCell gemCellBeingDragged, gemCellBeingReplaced;
@@ -53,7 +47,6 @@ public class GameActivity extends AppCompatActivity {
             R.drawable.gem_red,
             R.drawable.gem_yellow,
     };
-    private RelativeLayout relativeLayout;
     HashMap<List<Integer>, GemCell> gemCellList = new HashMap<>();
 
 
@@ -61,7 +54,6 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
-
         this.activity = this;
 
         // Get Screen dimensions for responsive
@@ -71,82 +63,12 @@ public class GameActivity extends AppCompatActivity {
         cellWidth = screenWidth / gridColCount;
 
         initGrid(); // Set grid col/row/size
-        initBoardGems(); // For each cell, create image view with random gem img
+        initBoardGems();
         initGemsSwipeListener();
         initPausePopupListeners();
 
-        // Init Chronometer
-        this.chronometer = findViewById(R.id.chronometer);
-        startChronometer();
-        // Reset timer after 30 seconds (feature test)
-        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
-            @Override
-            public void onChronometerTick(Chronometer chronometer) {
-                if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 30 * 1000) {
-                    resetChronometer();
-                }
-            }
-        });
-
-        this.textViewCountDown = findViewById(R.id.countdown);
-        startTimer();
-    }
-
-    public void startTimer () {
-        if (!countDownRunning) {
-            countDownTimer = new CountDownTimer(TIME_LEFT, 1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    TIME_LEFT = millisUntilFinished;
-                    updateCountDownText();
-                }
-                @Override
-                public void onFinish() {
-                    countDownRunning = false;
-                    resetTimer();
-                    startTimer();
-                }
-            }.start();
-            countDownRunning = true;
-        }
-    }
-    public void pauseTimer () {
-        if (countDownRunning) {
-            countDownTimer.cancel();
-            countDownRunning = false;
-        }
-    }
-    public void resetTimer () {
-        TIME_LEFT = START_TIME;
-        updateCountDownText();
-        Toast.makeText(GameActivity.this, "Reset Timer !", Toast.LENGTH_SHORT).show();
-    }
-    private void updateCountDownText () {
-        int minutes = (int) (TIME_LEFT / 1000) / 60;
-        int seconds = (int) (TIME_LEFT / 1000) % 60;
-
-        String formatedTimeLeft = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
-        textViewCountDown.setText(formatedTimeLeft);
-    }
-
-    public void startChronometer () {
-        if (!chronoRunning) {
-            chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
-            chronometer.start();
-            chronoRunning = true;
-        }
-    }
-    public void pauseChronometer () {
-        if (chronoRunning) {
-            chronometer.stop();
-            pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
-            chronoRunning = false;
-        }
-    }
-    public void resetChronometer () {
-        chronometer.setBase(SystemClock.elapsedRealtime());
-        pauseOffset = 0;
-        Toast.makeText(GameActivity.this, "Reset Chronometer !", Toast.LENGTH_SHORT).show();
+        this.gameChronometer = new GameChronometer(this);
+        this.gameTimer = new GameTimer(this);
     }
 
     private void initGrid () {
@@ -163,9 +85,7 @@ public class GameActivity extends AppCompatActivity {
                 ImageView imageView = new ImageView(this);
                 imageView.setVisibility(View.VISIBLE);
                 GemCell gemCell = new GemCell(r, c, imageView);
-
                 gridLayout.addView(gemCell.getImageView());
-
                 gemCellList.put(Collections.unmodifiableList(Arrays.asList(r, c)), gemCell);
             }
         }
@@ -202,6 +122,7 @@ public class GameActivity extends AppCompatActivity {
             });
         }
     }
+
     private void initInterchange(String direction, int x, int y, String translationX, int positive, GemCell gemCell) {
         Toast.makeText(GameActivity.this, direction, Toast.LENGTH_SHORT).show();
 
@@ -211,6 +132,7 @@ public class GameActivity extends AppCompatActivity {
             gemInterchange(translationX, positive);
         }
     }
+
     private void gemInterchange (String direction, int positive) {
         final ImageView animateGemDragged = createGemToAnimate(gemCellBeingDragged);
         final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
@@ -240,7 +162,6 @@ public class GameActivity extends AppCompatActivity {
                 relativeLayout.removeView(animateGemDragged);
                 relativeLayout.removeView(animateGemReplaced);
 
-
                 int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
                 int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
                 gemCellBeingDragged.updateImageView(replacedGem);
@@ -269,14 +190,14 @@ public class GameActivity extends AppCompatActivity {
                 final PausePopup pausePopup = new PausePopup(activity);
 
                 // Pause Timer/Chronometer
-                pauseTimer();
-                pauseChronometer();
+                gameTimer.pauseTimer();
+                gameChronometer.pauseChronometer();
                 // Cancel popup listener to restart timer/chronometer
                 pausePopup.setOnCancelListener(new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        startTimer(); // restart timer
-                        startChronometer(); // restart chronometer
+                        gameTimer.startTimer(); // restart timer
+                        gameChronometer.startChronometer(); // restart chronometer
                     }
                 });
 
@@ -284,8 +205,8 @@ public class GameActivity extends AppCompatActivity {
                 pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startTimer(); // restart timer
-                        startChronometer(); // restart chronometer
+                        gameTimer.startTimer(); // restart timer
+                        gameChronometer.startChronometer(); // restart chronometer
                         pausePopup.dismiss();
                     }
                 });
