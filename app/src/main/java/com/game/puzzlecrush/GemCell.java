@@ -54,11 +54,15 @@ public class GemCell extends GameActivity{
         return isEmpty;
     }
 
+    public void setEmpty(boolean empty) {
+        isEmpty = empty;
+    }
+
     public boolean isMatched () {
         return isMatched;
     }
-    public void setMatched() {
-        imageView.setBackgroundResource(R.drawable.cell_border);
-        isMatched = true;
+    public void setMatched (boolean matched) {
+        //        imageView.setBackgroundResource(R.drawable.cell_border);
+        isMatched = matched;
     }
 }

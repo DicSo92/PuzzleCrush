@@ -9,17 +9,15 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.SystemClock;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.Chronometer;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity {
     private ImageButton pauseBtn;
@@ -234,9 +231,9 @@ public class GameActivity extends AppCompatActivity {
                 GemCell rightGem = gemCellList.get(Arrays.asList(gem.getX(), gem.getY() + 1));
 
                 if (leftGem.getImageView().getTag().equals(gemTag) && rightGem.getImageView().getTag().equals(gemTag)) {
-                    leftGem.setMatched();
-                    gem.setMatched();
-                    rightGem.setMatched();
+                    leftGem.setMatched(true);
+                    gem.setMatched(true);
+                    rightGem.setMatched(true);
                 }
             }
             if (gem.getX() > 0 && gem.getX() < gridRowCount - 1) {
@@ -244,81 +241,154 @@ public class GameActivity extends AppCompatActivity {
                 GemCell bottomGem = gemCellList.get(Arrays.asList(gem.getX() + 1, gem.getY()));
 
                 if (topGem.getImageView().getTag().equals(gemTag) && bottomGem.getImageView().getTag().equals(gemTag)) {
-                    topGem.setMatched();
-                    gem.setMatched();
-                    bottomGem.setMatched();
+                    topGem.setMatched(true);
+                    gem.setMatched(true);
+                    bottomGem.setMatched(true);
                 }
             }
         }
+        removeMatches();
     }
 
 
 
     private void removeMatches () {
-        for (GemCell gem : gemCellList.values()) {
-            // Si isMatched
-            if (gem.isMatched()) {
-                // regarder toute les row au dessus
-                for (int i = 1; i <= gridRowCount; i++) {
-                    // Si la row n'existe pas (generer une nouvelle gemme)
-                    if (!gemCellList.containsKey(Arrays.asList(gem.getX() + i, gem.getY()))) {
+        final ArrayList<ObjectAnimator> animators = new ArrayList<>();
+        final ArrayList<ImageView> animateGemsFalling = new ArrayList<>();
+        final ArrayList<GemCell> gemsToDestroy = new ArrayList<>();
+        final ArrayList<Integer> gemsFalling = new ArrayList<>();
 
-                        break;
-                    }
-                    // Si la gem n'est pas match et pas empty (remplacer par celle-ci)
-                    if (!gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isMatched()
-                            && !gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isEmpty()) {
+        for (int r = 0; r < gridRowCount; r++) {
+            for (int c = 0; c < gridColCount; c++) {
+                GemCell gem = gemCellList.get(Arrays.asList(r, c));
+                // Si isMatched ou empty
+                if (gem.isMatched() || gem.isEmpty()) {
+                    // regarder toute les row au dessus
+                    for (int i = 1; i <= gridRowCount; i++) {
+                        // Si la row n'existe pas (generer une nouvelle gemme)
+                        if (!gemCellList.containsKey(Arrays.asList(gem.getX() + i, gem.getY()))) {
+                            final ImageView animateGemFalling = new ImageView(this);
+                            animateGemFalling.setPadding(10, 10, 10, 10);
+                            final int randomGem = (int) Math.floor(Math.random() * gems.length);
+                            animateGemFalling.setImageResource(gems[randomGem]);
+                            animateGemFalling.setTag(gems[randomGem]);
+                            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+                            params.leftMargin = gem.getImageView().getLeft();
+//                        params.topMargin = (gridRowCount + 1) * cellWidth;
+                            params.topMargin = (gridRowCount - 1) * cellWidth;
+                            relativeLayout.addView(animateGemFalling, params);
 
+                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount - 1) - gem.getX()) * cellWidth);
+                            animatorFalling.setDuration(1000);
 
-                        break;
+                            gem.getImageView().setVisibility(View.INVISIBLE);
+//                        gem.setEmpty(false);
+
+                            animators.add(animatorFalling);
+                            animateGemsFalling.add(animateGemFalling);
+                            gemsToDestroy.add(gem);
+                            gemsFalling.add((int) animateGemFalling.getTag());
+
+                            break;
+                        }
+                        // Si la gem n'est pas match et pas empty (remplacer par celle-ci)
+                        if (!gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isMatched()
+                                && !gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isEmpty()) {
+                            GemCell gemFalling = gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY()));
+
+                            gemFalling.setEmpty(true);
+
+                            ImageView animateGemFalling = createGemToAnimate(gemFalling);
+                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -(gemFalling.getX() - gem.getX()) * cellWidth);
+                            animatorFalling.setDuration(1000);
+                            gemFalling.getImageView().setVisibility(View.INVISIBLE);
+                            gem.getImageView().setVisibility(View.INVISIBLE);
+//                        gem.setEmpty(false);
+
+                            animators.add(animatorFalling);
+                            animateGemsFalling.add(animateGemFalling);
+                            gemsToDestroy.add(gem);
+                            gemsFalling.add((int) gemFalling.getImageView().getTag());
+
+                            break;
+                        }
                     }
                 }
             }
         }
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(animators.toArray(new ObjectAnimator[1]));
+        animatorSet.start();
+        animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                for (int i = 0; i < gemsToDestroy.size(); i++) {
+                    relativeLayout.removeView(animateGemsFalling.get(i));
+                    gemsToDestroy.get(i).setMatched(false);
+                    gemsToDestroy.get(i).setEmpty(false);
+//                    gemsToDestroy.get(i).getImageView().setBackgroundResource(0);
+                    gemsToDestroy.get(i).updateImageView(gemsFalling.get(i));
+                }
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        findMatches();
+                    }
+                }, 500);
+            }
+        });
     }
-//    private void gemComboInterchange(GemCell gemToDestroy, GemCell gemFalling, int positive) {
-//        final ImageView animateGemDestroy = createGemComboToAnimate(gemToDestroy);
-//        final ImageView animateGemFalling = createGemComboToAnimate(gemFalling);
+
+
+
+
+//    private ObjectAnimator gemComboInterchange(final GemCell gemToDestroy, final GemCell gemFalling) {
+//        final ImageView animateGemFalling = createGemToAnimate(gemFalling);
 //
-//        ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, "translationY", positive * cellWidth);
-//        animatorDragged.setDuration(500);
-//        ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, "translationY", -positive * cellWidth);
-//        animatorReplaced.setDuration(500);
+//        ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -(gemFalling.getX() - gemToDestroy.getX()) * cellWidth);
+//        animatorFalling.setDuration(1000);
 //
-//        AnimatorSet animatorSet = new AnimatorSet();
-//        animatorSet.playTogether(animatorDragged, animatorReplaced);
-//        animatorSet.start();
+//        gemFalling.getImageView().setVisibility(View.INVISIBLE);
 //
-//        gemCellBeingReplaced.getImageView().setVisibility(View.INVISIBLE);
-//        gemCellBeingDragged.getImageView().setVisibility(View.INVISIBLE);
+//        return animatorFalling;
+////        gemToDestroy.getImageView().setVisibility(View.INVISIBLE);
+//    }
+//
+//    private void gemComboRandomNew(final GemCell gemToDestroy) {
+//        final ImageView animateGemFalling = new ImageView(this);
+//        animateGemFalling.setPadding(10, 10, 10, 10);
+//        final int randomGem = (int) Math.floor(Math.random() * gems.length);
+//        animateGemFalling.setImageResource(gems[randomGem]);
+//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+//        params.leftMargin = gemToDestroy.getImageView().getLeft();
+//        params.topMargin = (gridRowCount + 1) * cellWidth;
+//        relativeLayout.addView(animateGemFalling, params);
+//
+//        ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount + 1) - gemToDestroy.getX()) * cellWidth);
+//        animatorFalling.setDuration(1000);
+//        animatorFalling.start();
+//
+////        gemToDestroy.getImageView().setVisibility(View.INVISIBLE);
+////        gemFalling.getImageView().setVisibility(View.INVISIBLE);
 //
 //
-//        animatorSet.addListener(new AnimatorListenerAdapter() {
+//        animatorFalling.addListener(new AnimatorListenerAdapter() {
 //            @Override
 //            public void onAnimationEnd(Animator animation) {
 //                super.onAnimationEnd(animation);
 //
-//                relativeLayout.removeView(animateGemDragged);
-//                relativeLayout.removeView(animateGemReplaced);
+//                relativeLayout.removeView(animateGemFalling);
 //
-//                int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
-//                int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
-//                gemCellBeingDragged.updateImageView(replacedGem);
-//                gemCellBeingReplaced.updateImageView(draggedGem);
+//                gemToDestroy.getImageView().setBackgroundResource(0);
+//
+//                gemToDestroy.updateImageView(gems[randomGem]);
 //
 ////                findMatches();
 //            }
 //        });
-//    }
-//
-//    private ImageView createGemComboToAnimate(GemCell gemCellToDuplicate) {
-//        final ImageView animateGem = new ImageView(this);
-//        animateGem.setPadding(10, 10, 10, 10);
-//        animateGem.setImageResource((int) gemCellToDuplicate.getImageView().getTag());
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
-//        params.leftMargin = gemCellToDuplicate.getImageView().getLeft();
-//        params.topMargin = gemCellToDuplicate.getImageView().getTop();
-//        relativeLayout.addView(animateGem, params);
-//        return animateGem;
 //    }
 }
