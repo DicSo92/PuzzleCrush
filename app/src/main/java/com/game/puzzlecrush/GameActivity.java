@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -31,11 +32,12 @@ public class GameActivity extends AppCompatActivity {
     private GameActivity activity;
     private GridLayout gridLayout;
     private RelativeLayout relativeLayout;
+    private LinearLayout heroLayout;
 
     GameChronometer gameChronometer;
     GameTimer gameTimer;
 
-    public static int cellWidth, screenWidth, gridColCount = 7, gridRowCount = 5;
+    public static int cellWidth, screenWidth, screenHeight, gridColCount = 7, gridRowCount = 5;
     GemCell gemCellBeingDragged, gemCellBeingReplaced;
     public static int[] gems = {
             R.drawable.gem_blue,
@@ -53,10 +55,15 @@ public class GameActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game);
         this.activity = this;
 
+        this.relativeLayout = (RelativeLayout) findViewById(R.id.mainAnimLayout);
+        this.gridLayout = findViewById(R.id.gemGrid); // Get grid
+        this.heroLayout = findViewById(R.id.heroLayout);
+
         // Get Screen dimensions for responsive
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         screenWidth = displayMetrics.widthPixels;
+        screenHeight = displayMetrics.heightPixels;
         cellWidth = screenWidth / gridColCount;
 
         initGrid(); // Set grid col/row/size
@@ -69,8 +76,6 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initGrid() {
-        this.relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
-        this.gridLayout = findViewById(R.id.gemGrid); // Get grid
         gridLayout.setColumnCount(gridColCount);
         gridLayout.setRowCount(gridRowCount);
         gridLayout.getLayoutParams().width = screenWidth;
@@ -148,9 +153,9 @@ public class GameActivity extends AppCompatActivity {
         final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
 
         ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, translation, positive * cellWidth);
-        animatorDragged.setDuration(500);
+        animatorDragged.setDuration(300);
         ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, translation, -positive * cellWidth);
-        animatorReplaced.setDuration(500);
+        animatorReplaced.setDuration(300);
 
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animatorDragged, animatorReplaced);
@@ -173,7 +178,13 @@ public class GameActivity extends AppCompatActivity {
                 gemCellBeingDragged.updateImageView(replacedGem);
                 gemCellBeingReplaced.updateImageView(draggedGem);
 
-                findMatches();
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        findMatches();
+                    }
+                }, 100);
             }
         });
     }
@@ -184,7 +195,10 @@ public class GameActivity extends AppCompatActivity {
         animateGem.setImageResource((int) gemCellToDuplicate.getImageView().getTag());
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
         params.leftMargin = gemCellToDuplicate.getImageView().getLeft();
-        params.topMargin = gemCellToDuplicate.getImageView().getTop();
+
+        int gemGridTop = screenHeight - (gridLayout.getMeasuredHeight() + heroLayout.getMeasuredHeight());
+        params.topMargin = gemGridTop + gemCellToDuplicate.getImageView().getTop();
+
         relativeLayout.addView(animateGem, params);
         return animateGem;
     }
@@ -285,12 +299,14 @@ public class GameActivity extends AppCompatActivity {
                             animateGemFalling.setTag(gems[randomGem]);
                             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
                             params.leftMargin = gem.getImageView().getLeft();
-//                        params.topMargin = (gridRowCount + 1) * cellWidth;
-                            params.topMargin = (gridRowCount - 1) * cellWidth;
+
+                            int gemGridTop = screenHeight - (gridLayout.getMeasuredHeight() + heroLayout.getMeasuredHeight());
+                            params.topMargin = gemGridTop + (gridRowCount + 2) * cellWidth;
+
                             relativeLayout.addView(animateGemFalling, params);
 
-                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount - 1) - gem.getX()) * cellWidth);
-                            animatorFalling.setDuration(1000);
+                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount + 2) - gem.getX()) * cellWidth);
+                            animatorFalling.setDuration(500);
 
                             gem.getImageView().setVisibility(View.INVISIBLE);
 //                        gem.setEmpty(false);
@@ -311,7 +327,7 @@ public class GameActivity extends AppCompatActivity {
 
                             ImageView animateGemFalling = createGemToAnimate(gemFalling);
                             ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -(gemFalling.getX() - gem.getX()) * cellWidth);
-                            animatorFalling.setDuration(1000);
+                            animatorFalling.setDuration(500);
                             gemFalling.getImageView().setVisibility(View.INVISIBLE);
                             gem.getImageView().setVisibility(View.INVISIBLE);
 //                        gem.setEmpty(false);
@@ -353,53 +369,4 @@ public class GameActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
-//    private ObjectAnimator gemComboInterchange(final GemCell gemToDestroy, final GemCell gemFalling) {
-//        final ImageView animateGemFalling = createGemToAnimate(gemFalling);
-//
-//        ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -(gemFalling.getX() - gemToDestroy.getX()) * cellWidth);
-//        animatorFalling.setDuration(1000);
-//
-//        gemFalling.getImageView().setVisibility(View.INVISIBLE);
-//
-//        return animatorFalling;
-////        gemToDestroy.getImageView().setVisibility(View.INVISIBLE);
-//    }
-//
-//    private void gemComboRandomNew(final GemCell gemToDestroy) {
-//        final ImageView animateGemFalling = new ImageView(this);
-//        animateGemFalling.setPadding(10, 10, 10, 10);
-//        final int randomGem = (int) Math.floor(Math.random() * gems.length);
-//        animateGemFalling.setImageResource(gems[randomGem]);
-//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
-//        params.leftMargin = gemToDestroy.getImageView().getLeft();
-//        params.topMargin = (gridRowCount + 1) * cellWidth;
-//        relativeLayout.addView(animateGemFalling, params);
-//
-//        ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount + 1) - gemToDestroy.getX()) * cellWidth);
-//        animatorFalling.setDuration(1000);
-//        animatorFalling.start();
-//
-////        gemToDestroy.getImageView().setVisibility(View.INVISIBLE);
-////        gemFalling.getImageView().setVisibility(View.INVISIBLE);
-//
-//
-//        animatorFalling.addListener(new AnimatorListenerAdapter() {
-//            @Override
-//            public void onAnimationEnd(Animator animation) {
-//                super.onAnimationEnd(animation);
-//
-//                relativeLayout.removeView(animateGemFalling);
-//
-//                gemToDestroy.getImageView().setBackgroundResource(0);
-//
-//                gemToDestroy.updateImageView(gems[randomGem]);
-//
-////                findMatches();
-//            }
-//        });
-//    }
 }
