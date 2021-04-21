@@ -71,7 +71,7 @@ public class GameActivity extends AppCompatActivity {
         this.gameTimer = new GameTimer(this);
     }
 
-    private void initGrid () {
+    private void initGrid() {
         this.relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout);
         this.gridLayout = findViewById(R.id.gemGrid); // Get grid
         gridLayout.setColumnCount(gridColCount);
@@ -79,9 +79,10 @@ public class GameActivity extends AppCompatActivity {
         gridLayout.getLayoutParams().width = screenWidth;
         gridLayout.getLayoutParams().height = cellWidth * gridRowCount;
     }
-    private void initBoardGems () {
-        for (int r=0; r < gridRowCount; r++) {
-            for (int c=0; c < gridColCount; c++) {
+
+    private void initBoardGems() {
+        for (int r = 0; r < gridRowCount; r++) {
+            for (int c = 0; c < gridColCount; c++) {
                 ImageView imageView = new ImageView(this);
                 imageView.setVisibility(View.VISIBLE);
                 GemCell gemCell = new GemCell(r, c, imageView);
@@ -92,27 +93,29 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void initGemsSwipeListener () {
+    private void initGemsSwipeListener() {
         for (final GemCell gemCell : gemCellList.values()) {
             ImageView imageView = gemCell.getImageView();
 
-            imageView.setOnTouchListener(new OnGemSwipe(this)
-            {
+            imageView.setOnTouchListener(new OnGemSwipe(this) {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
                     initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
                 }
+
                 @Override
                 void swipeRight() {
                     super.swipeRight();
                     initInterchange("Right", gemCell.getX(), gemCell.getY() + 1, "translationX", 1, gemCell);
                 }
+
                 @Override
                 void swipeTop() {
                     super.swipeTop();
                     initInterchange("Top", gemCell.getX() - 1, gemCell.getY(), "translationY", -1, gemCell);
                 }
+
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
@@ -122,23 +125,23 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void initInterchange(String direction, int x, int y, String translationX, int positive, GemCell gemCell) {
+    private void initInterchange(String direction, int x, int y, String translation, int positive, GemCell gemCell) {
         Toast.makeText(GameActivity.this, direction, Toast.LENGTH_SHORT).show();
 
         if (gemCellList.containsKey(Arrays.asList(x, y))) {
             gemCellBeingDragged = gemCell;
             gemCellBeingReplaced = gemCellList.get(Arrays.asList(x, y));
-            gemInterchange(translationX, positive);
+            gemInterchange(translation, positive);
         }
     }
 
-    private void gemInterchange (String direction, int positive) {
+    private void gemInterchange(String translation, int positive) {
         final ImageView animateGemDragged = createGemToAnimate(gemCellBeingDragged);
         final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
 
-        ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, direction, positive * cellWidth);
+        ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, translation, positive * cellWidth);
         animatorDragged.setDuration(500);
-        ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, direction, -positive * cellWidth);
+        ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, translation, -positive * cellWidth);
         animatorReplaced.setDuration(500);
 
         AnimatorSet animatorSet = new AnimatorSet();
@@ -161,6 +164,8 @@ public class GameActivity extends AppCompatActivity {
                 int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
                 gemCellBeingDragged.updateImageView(replacedGem);
                 gemCellBeingReplaced.updateImageView(draggedGem);
+
+                findMatches();
             }
         });
     }
@@ -220,4 +225,100 @@ public class GameActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void findMatches() {
+        for (GemCell gem : gemCellList.values()) {
+            Object gemTag = gem.getImageView().getTag();
+            if (gem.getY() > 0 && gem.getY() < gridColCount - 1) {
+                GemCell leftGem = gemCellList.get(Arrays.asList(gem.getX(), gem.getY() - 1));
+                GemCell rightGem = gemCellList.get(Arrays.asList(gem.getX(), gem.getY() + 1));
+
+                if (leftGem.getImageView().getTag().equals(gemTag) && rightGem.getImageView().getTag().equals(gemTag)) {
+                    leftGem.setMatched();
+                    gem.setMatched();
+                    rightGem.setMatched();
+                }
+            }
+            if (gem.getX() > 0 && gem.getX() < gridRowCount - 1) {
+                GemCell topGem = gemCellList.get(Arrays.asList(gem.getX() - 1, gem.getY()));
+                GemCell bottomGem = gemCellList.get(Arrays.asList(gem.getX() + 1, gem.getY()));
+
+                if (topGem.getImageView().getTag().equals(gemTag) && bottomGem.getImageView().getTag().equals(gemTag)) {
+                    topGem.setMatched();
+                    gem.setMatched();
+                    bottomGem.setMatched();
+                }
+            }
+        }
+    }
+
+
+
+    private void removeMatches () {
+        for (GemCell gem : gemCellList.values()) {
+            // Si isMatched
+            if (gem.isMatched()) {
+                // regarder toute les row au dessus
+                for (int i = 1; i <= gridRowCount; i++) {
+                    // Si la row n'existe pas (generer une nouvelle gemme)
+                    if (!gemCellList.containsKey(Arrays.asList(gem.getX() + i, gem.getY()))) {
+
+                        break;
+                    }
+                    // Si la gem n'est pas match et pas empty (remplacer par celle-ci)
+                    if (!gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isMatched()
+                            && !gemCellList.get(Arrays.asList(gem.getX() + i, gem.getY())).isEmpty()) {
+
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+//    private void gemComboInterchange(GemCell gemToDestroy, GemCell gemFalling, int positive) {
+//        final ImageView animateGemDestroy = createGemComboToAnimate(gemToDestroy);
+//        final ImageView animateGemFalling = createGemComboToAnimate(gemFalling);
+//
+//        ObjectAnimator animatorDragged = ObjectAnimator.ofFloat(animateGemDragged, "translationY", positive * cellWidth);
+//        animatorDragged.setDuration(500);
+//        ObjectAnimator animatorReplaced = ObjectAnimator.ofFloat(animateGemReplaced, "translationY", -positive * cellWidth);
+//        animatorReplaced.setDuration(500);
+//
+//        AnimatorSet animatorSet = new AnimatorSet();
+//        animatorSet.playTogether(animatorDragged, animatorReplaced);
+//        animatorSet.start();
+//
+//        gemCellBeingReplaced.getImageView().setVisibility(View.INVISIBLE);
+//        gemCellBeingDragged.getImageView().setVisibility(View.INVISIBLE);
+//
+//
+//        animatorSet.addListener(new AnimatorListenerAdapter() {
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                super.onAnimationEnd(animation);
+//
+//                relativeLayout.removeView(animateGemDragged);
+//                relativeLayout.removeView(animateGemReplaced);
+//
+//                int replacedGem = (int) gemCellBeingReplaced.getImageView().getTag();
+//                int draggedGem = (int) gemCellBeingDragged.getImageView().getTag();
+//                gemCellBeingDragged.updateImageView(replacedGem);
+//                gemCellBeingReplaced.updateImageView(draggedGem);
+//
+////                findMatches();
+//            }
+//        });
+//    }
+//
+//    private ImageView createGemComboToAnimate(GemCell gemCellToDuplicate) {
+//        final ImageView animateGem = new ImageView(this);
+//        animateGem.setPadding(10, 10, 10, 10);
+//        animateGem.setImageResource((int) gemCellToDuplicate.getImageView().getTag());
+//        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(cellWidth, cellWidth);
+//        params.leftMargin = gemCellToDuplicate.getImageView().getLeft();
+//        params.topMargin = gemCellToDuplicate.getImageView().getTop();
+//        relativeLayout.addView(animateGem, params);
+//        return animateGem;
+//    }
 }

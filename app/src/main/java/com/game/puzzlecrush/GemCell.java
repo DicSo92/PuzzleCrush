@@ -7,6 +7,8 @@ import android.widget.ImageView;
 public class GemCell extends GameActivity{
     private int x, y, id;
     private ImageView imageView;
+    public boolean isMatched = false;
+    public boolean isEmpty = false;
 
     public GemCell(int row, int col, ImageView gemImage) {
         this.x = row;
@@ -46,5 +48,17 @@ public class GemCell extends GameActivity{
         this.imageView.setImageResource(gem);
         this.imageView.setTag(gem);
         this.imageView.setVisibility(View.VISIBLE);
+    }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
+
+    public boolean isMatched () {
+        return isMatched;
+    }
+    public void setMatched() {
+        imageView.setBackgroundResource(R.drawable.cell_border);
+        isMatched = true;
     }
 }
