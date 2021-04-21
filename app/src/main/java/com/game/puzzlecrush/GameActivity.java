@@ -9,7 +9,6 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -133,7 +132,7 @@ public class GameActivity extends AppCompatActivity {
         for (final GemCell gemCell : gemCellList.values()) {
             ImageView imageView = gemCell.getImageView();
 
-            imageView.setOnTouchListener(new OnGemSwipe(this) {
+            imageView.setOnTouchListener(new OnGemTouch(this) {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
@@ -169,12 +168,26 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 void clicked() {
                     super.clicked();
-                    // Verifier si une cell est deja check,
-                    // Si c'est le cas, verifier si elle est adjacente à celle clicker
-                    // Si oui, swipe les deux, puis uncheck les deux
-                    // Sinon uncheck tout les autres avant de check celui clicker
-                    gemCell.setChecked(true);
-                    System.out.println("testation");
+                    gemCell.setSelected(!gemCell.isSelected());
+
+                    for (GemCell currGem : gemCellList.values()) {
+                        boolean isSameGem = (gemCell.getX() == currGem.getX()) && (currGem.getY() == gemCell.getY());
+
+                        if (currGem.isSelected() && !isSameGem) {
+                            if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() + 1)
+                                this.swipeLeft();
+                            else if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() - 1)
+                                this.swipeRight();
+                            else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() + 1)
+                                this.swipeTop();
+                            else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() - 1)
+                                this.swipeBottom();
+
+                            currGem.setSelected(false);
+                            gemCell.setSelected(false);
+                            break;
+                        }
+                    }
                 }
             });
         }
