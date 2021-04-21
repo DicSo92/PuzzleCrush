@@ -29,6 +29,12 @@ public class OnGemSwipe implements View.OnTouchListener {
         }
 
         @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            clicked();
+            return super.onSingleTapUp(e);
+        }
+
+        @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             boolean result = false;
             float yDiff = e2.getY() - e1.getY();
@@ -61,4 +67,5 @@ public class OnGemSwipe implements View.OnTouchListener {
     void swipeRight () { }
     void swipeTop () { }
     void swipeBottom () { }
+    void clicked () { }
 }
