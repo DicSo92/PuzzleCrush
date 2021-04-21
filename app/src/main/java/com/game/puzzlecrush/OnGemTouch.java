@@ -5,7 +5,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class OnGemSwipe implements View.OnTouchListener {
+public class OnGemTouch implements View.OnTouchListener {
     public GestureDetector gestureDetector;
 
     @Override
@@ -13,7 +13,7 @@ public class OnGemSwipe implements View.OnTouchListener {
         return gestureDetector.onTouchEvent(event);
     }
 
-    public OnGemSwipe (Context context)
+    public OnGemTouch(Context context)
     {
         gestureDetector = new GestureDetector(context, new GestureListener());
     }

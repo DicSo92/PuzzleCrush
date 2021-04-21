@@ -1,7 +1,6 @@
 package com.game.puzzlecrush;
 
 import android.view.View;
-import android.widget.GridLayout;
 import android.widget.ImageView;
 
 public class GemCell extends GameActivity{
@@ -9,7 +8,7 @@ public class GemCell extends GameActivity{
     private ImageView imageView;
     public boolean isMatched = false;
     public boolean isEmpty = false;
-    public boolean isChecked = false;
+    public boolean isSelected = false;
 
     public GemCell(int row, int col, ImageView gemImage) {
         this.x = row;
@@ -65,8 +64,10 @@ public class GemCell extends GameActivity{
         isMatched = matched;
     }
 
-    public void setChecked(boolean checked) {
-        imageView.setBackgroundResource(checked ? R.drawable.cell_border : 0);
-        isChecked = checked;
+    public boolean isSelected() { return isSelected; }
+
+    public void setSelected(boolean selected) {
+        imageView.setBackgroundResource(selected ? R.drawable.cell_border : 0);
+        isSelected = selected;
     }
 }
