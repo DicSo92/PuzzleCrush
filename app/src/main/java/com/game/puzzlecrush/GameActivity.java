@@ -86,13 +86,44 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initBoardGems() {
+//        ArrayList<ImageView> imageViews;
         for (int r = 0; r < gridRowCount; r++) {
             for (int c = 0; c < gridColCount; c++) {
                 ImageView imageView = new ImageView(this);
                 imageView.setVisibility(View.VISIBLE);
                 GemCell gemCell = new GemCell(r, c, imageView);
+
+
+
                 gridLayout.addView(gemCell.getImageView());
                 gemCellList.put(Collections.unmodifiableList(Arrays.asList(r, c)), gemCell);
+            }
+        }
+
+        boolean hasMatches = true;
+
+        while (hasMatches) {
+            hasMatches = false;
+            for (GemCell gem : gemCellList.values()) {
+                Object gemTag = gem.getImageView().getTag();
+                if (gem.getY() > 0 && gem.getY() < gridColCount - 1) {
+                    GemCell leftGem = gemCellList.get(Arrays.asList(gem.getX(), gem.getY() - 1));
+                    GemCell rightGem = gemCellList.get(Arrays.asList(gem.getX(), gem.getY() + 1));
+
+                    if (leftGem.getImageView().getTag().equals(gemTag) && rightGem.getImageView().getTag().equals(gemTag)) {
+                        gem.updateImageView(gems[(int) Math.floor(Math.random() * gems.length)]);
+                        hasMatches = true;
+                    }
+                }
+                if (gem.getX() > 0 && gem.getX() < gridRowCount - 1) {
+                    GemCell topGem = gemCellList.get(Arrays.asList(gem.getX() - 1, gem.getY()));
+                    GemCell bottomGem = gemCellList.get(Arrays.asList(gem.getX() + 1, gem.getY()));
+
+                    if (topGem.getImageView().getTag().equals(gemTag) && bottomGem.getImageView().getTag().equals(gemTag)) {
+                        gem.updateImageView(gems[(int) Math.floor(Math.random() * gems.length)]);
+                        hasMatches = true;
+                    }
+                }
             }
         }
     }
