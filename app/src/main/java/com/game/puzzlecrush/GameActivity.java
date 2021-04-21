@@ -37,6 +37,9 @@ public class GameActivity extends AppCompatActivity {
     GameChronometer gameChronometer;
     GameTimer gameTimer;
 
+    public boolean isAnimationsRunning = false;
+    public boolean isSwipeRunning = false;
+
     public static int cellWidth, screenWidth, screenHeight, gridColCount = 7, gridRowCount = 5;
     GemCell gemCellBeingDragged, gemCellBeingReplaced;
     public static int[] gems = {
@@ -103,25 +106,33 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 void swipeLeft() {
                     super.swipeLeft();
-                    initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
+                    if (!isAnimationsRunning && !isSwipeRunning) {
+                        initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
+                    }
                 }
 
                 @Override
                 void swipeRight() {
                     super.swipeRight();
-                    initInterchange("Right", gemCell.getX(), gemCell.getY() + 1, "translationX", 1, gemCell);
+                    if (!isAnimationsRunning && !isSwipeRunning) {
+                        initInterchange("Right", gemCell.getX(), gemCell.getY() + 1, "translationX", 1, gemCell);
+                    }
                 }
 
                 @Override
                 void swipeTop() {
                     super.swipeTop();
-                    initInterchange("Top", gemCell.getX() - 1, gemCell.getY(), "translationY", -1, gemCell);
+                    if (!isAnimationsRunning && !isSwipeRunning) {
+                        initInterchange("Top", gemCell.getX() - 1, gemCell.getY(), "translationY", -1, gemCell);
+                    }
                 }
 
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
-                    initInterchange("Bottom", gemCell.getX() + 1, gemCell.getY(), "translationY", 1, gemCell);
+                    if (!isAnimationsRunning && !isSwipeRunning) {
+                        initInterchange("Bottom", gemCell.getX() + 1, gemCell.getY(), "translationY", 1, gemCell);
+                    }
                 }
 
                 @Override
@@ -164,8 +175,14 @@ public class GameActivity extends AppCompatActivity {
         gemCellBeingReplaced.getImageView().setVisibility(View.INVISIBLE);
         gemCellBeingDragged.getImageView().setVisibility(View.INVISIBLE);
 
-
+        isSwipeRunning = true;
         animatorSet.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                isSwipeRunning = true;
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -182,6 +199,7 @@ public class GameActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isSwipeRunning = false;
                         findMatches();
                     }
                 }, 100);
@@ -249,6 +267,9 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void findMatches() {
+        boolean hasMatches = false;
+        isAnimationsRunning = true;
+
         for (GemCell gem : gemCellList.values()) {
             Object gemTag = gem.getImageView().getTag();
             if (gem.getY() > 0 && gem.getY() < gridColCount - 1) {
@@ -259,6 +280,7 @@ public class GameActivity extends AppCompatActivity {
                     leftGem.setMatched(true);
                     gem.setMatched(true);
                     rightGem.setMatched(true);
+                    hasMatches = true;
                 }
             }
             if (gem.getX() > 0 && gem.getX() < gridRowCount - 1) {
@@ -269,10 +291,15 @@ public class GameActivity extends AppCompatActivity {
                     topGem.setMatched(true);
                     gem.setMatched(true);
                     bottomGem.setMatched(true);
+                    hasMatches = true;
                 }
             }
         }
-        removeMatches();
+        if (hasMatches) {
+            removeMatches();
+        } else {
+            isAnimationsRunning = false;
+        }
     }
 
 
@@ -301,11 +328,11 @@ public class GameActivity extends AppCompatActivity {
                             params.leftMargin = gem.getImageView().getLeft();
 
                             int gemGridTop = screenHeight - (gridLayout.getMeasuredHeight() + heroLayout.getMeasuredHeight());
-                            params.topMargin = gemGridTop + (gridRowCount + 2) * cellWidth;
+                            params.topMargin = gemGridTop + (gridRowCount + 3) * cellWidth;
 
                             relativeLayout.addView(animateGemFalling, params);
 
-                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount + 2) - gem.getX()) * cellWidth);
+                            ObjectAnimator animatorFalling = ObjectAnimator.ofFloat(animateGemFalling, "translationY", -((gridRowCount + 3) - gem.getX()) * cellWidth);
                             animatorFalling.setDuration(500);
 
                             gem.getImageView().setVisibility(View.INVISIBLE);
@@ -348,6 +375,12 @@ public class GameActivity extends AppCompatActivity {
         animatorSet.start();
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                isAnimationsRunning = true;
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
 
@@ -363,6 +396,7 @@ public class GameActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
+                        isAnimationsRunning = false;
                         findMatches();
                     }
                 }, 500);
