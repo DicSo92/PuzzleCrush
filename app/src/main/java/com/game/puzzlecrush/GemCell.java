@@ -9,6 +9,7 @@ public class GemCell extends GameActivity{
     private ImageView imageView;
     public boolean isMatched = false;
     public boolean isEmpty = false;
+    public boolean isChecked = false;
 
     public GemCell(int row, int col, ImageView gemImage) {
         this.x = row;
@@ -53,7 +54,6 @@ public class GemCell extends GameActivity{
     public boolean isEmpty() {
         return isEmpty;
     }
-
     public void setEmpty(boolean empty) {
         isEmpty = empty;
     }
@@ -62,7 +62,11 @@ public class GemCell extends GameActivity{
         return isMatched;
     }
     public void setMatched (boolean matched) {
-        //        imageView.setBackgroundResource(R.drawable.cell_border);
         isMatched = matched;
+    }
+
+    public void setChecked(boolean checked) {
+        imageView.setBackgroundResource(checked ? R.drawable.cell_border : 0);
+        isChecked = checked;
     }
 }

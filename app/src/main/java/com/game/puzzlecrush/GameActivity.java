@@ -118,6 +118,17 @@ public class GameActivity extends AppCompatActivity {
                     super.swipeBottom();
                     initInterchange("Bottom", gemCell.getX() + 1, gemCell.getY(), "translationY", 1, gemCell);
                 }
+
+                @Override
+                void clicked() {
+                    super.clicked();
+                    // Verifier si une cell est deja check,
+                    // Si c'est le cas, verifier si elle est adjacente à celle clicker
+                    // Si oui, swipe les deux, puis uncheck les deux
+                    // Sinon uncheck tout les autres avant de check celui clicker
+                    gemCell.setChecked(true);
+                    System.out.println("testation");
+                }
             });
         }
     }
