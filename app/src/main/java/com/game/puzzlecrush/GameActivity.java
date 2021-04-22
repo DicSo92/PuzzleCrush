@@ -140,7 +140,6 @@ public class GameActivity extends AppCompatActivity {
                         initInterchange("Left", gemCell.getX(), gemCell.getY() - 1, "translationX", -1, gemCell);
                     }
                 }
-
                 @Override
                 void swipeRight() {
                     super.swipeRight();
@@ -148,7 +147,6 @@ public class GameActivity extends AppCompatActivity {
                         initInterchange("Right", gemCell.getX(), gemCell.getY() + 1, "translationX", 1, gemCell);
                     }
                 }
-
                 @Override
                 void swipeTop() {
                     super.swipeTop();
@@ -156,7 +154,6 @@ public class GameActivity extends AppCompatActivity {
                         initInterchange("Top", gemCell.getX() - 1, gemCell.getY(), "translationY", -1, gemCell);
                     }
                 }
-
                 @Override
                 void swipeBottom() {
                     super.swipeBottom();
@@ -164,14 +161,11 @@ public class GameActivity extends AppCompatActivity {
                         initInterchange("Bottom", gemCell.getX() + 1, gemCell.getY(), "translationY", 1, gemCell);
                     }
                 }
-
                 @Override
                 void clicked() {
                     super.clicked();
                     if (!isAnimationsRunning && !isSwipeRunning) {
-
                         gemCell.setSelected(!gemCell.isSelected());
-
                         for (GemCell currGem : gemCellList.values()) {
                             boolean isSameGem = (gemCell.getX() == currGem.getX()) && (currGem.getY() == gemCell.getY());
 
@@ -258,7 +252,7 @@ public class GameActivity extends AppCompatActivity {
                             gemInterchange(translation, positive, false);
                         }
                     }
-                }, 200);
+                }, 100);
             }
         });
     }
@@ -277,50 +271,6 @@ public class GameActivity extends AppCompatActivity {
         return animateGem;
     }
 
-    private void initPausePopupListeners() {
-        this.pauseBtn = findViewById(R.id.pauseBtn); // Get pauseBtn
-        pauseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Init new Popup (PausePopup Class)
-                final PausePopup pausePopup = new PausePopup(activity);
-
-                // Pause Timer/Chronometer
-                gameTimer.pauseTimer();
-                gameChronometer.pauseChronometer();
-                // Cancel popup listener to restart timer/chronometer
-                pausePopup.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        gameTimer.startTimer(); // restart timer
-                        gameChronometer.startChronometer(); // restart chronometer
-                    }
-                });
-
-                // On click continue Button
-                pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        gameTimer.startTimer(); // restart timer
-                        gameChronometer.startChronometer(); // restart chronometer
-                        pausePopup.dismiss();
-                    }
-                });
-                // On click BackMenu Button
-                pausePopup.getBtn_backMenu().setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent newMainActivity = new Intent(getApplicationContext(), MainActivity.class);
-                        startActivity(newMainActivity);
-                        finish();
-                        pausePopup.dismiss();
-                    }
-                });
-                // Build/Create Popup
-                pausePopup.Build();
-            }
-        });
-    }
 
     private boolean findMatches() {
         boolean hasMatches = false;
@@ -458,6 +408,51 @@ public class GameActivity extends AppCompatActivity {
                         findMatches();
                     }
                 }, 500);
+            }
+        });
+    }
+
+    private void initPausePopupListeners() {
+        this.pauseBtn = findViewById(R.id.pauseBtn); // Get pauseBtn
+        pauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Init new Popup (PausePopup Class)
+                final PausePopup pausePopup = new PausePopup(activity);
+
+                // Pause Timer/Chronometer
+                gameTimer.pauseTimer();
+                gameChronometer.pauseChronometer();
+                // Cancel popup listener to restart timer/chronometer
+                pausePopup.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        gameTimer.startTimer(); // restart timer
+                        gameChronometer.startChronometer(); // restart chronometer
+                    }
+                });
+
+                // On click continue Button
+                pausePopup.getBtn_continue().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        gameTimer.startTimer(); // restart timer
+                        gameChronometer.startChronometer(); // restart chronometer
+                        pausePopup.dismiss();
+                    }
+                });
+                // On click BackMenu Button
+                pausePopup.getBtn_backMenu().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent newMainActivity = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(newMainActivity);
+                        finish();
+                        pausePopup.dismiss();
+                    }
+                });
+                // Build/Create Popup
+                pausePopup.Build();
             }
         });
     }
