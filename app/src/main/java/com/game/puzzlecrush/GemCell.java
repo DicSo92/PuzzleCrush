@@ -67,7 +67,8 @@ public class GemCell extends GameActivity{
     public boolean isSelected() { return isSelected; }
 
     public void setSelected(boolean selected) {
-        imageView.setBackgroundResource(selected ? R.drawable.cell_border : 0);
+        imageView.setBackgroundResource(selected ? R.drawable.cell_border : 0); //kill surement la padding
+        imageView.setPadding(10,10,10,10);
         isSelected = selected;
     }
 }

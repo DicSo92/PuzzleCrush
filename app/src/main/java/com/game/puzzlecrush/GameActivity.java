@@ -168,24 +168,31 @@ public class GameActivity extends AppCompatActivity {
                 @Override
                 void clicked() {
                     super.clicked();
-                    gemCell.setSelected(!gemCell.isSelected());
+                    if (!isAnimationsRunning && !isSwipeRunning) {
 
-                    for (GemCell currGem : gemCellList.values()) {
-                        boolean isSameGem = (gemCell.getX() == currGem.getX()) && (currGem.getY() == gemCell.getY());
+                        gemCell.setSelected(!gemCell.isSelected());
 
-                        if (currGem.isSelected() && !isSameGem) {
-                            if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() + 1)
-                                this.swipeLeft();
-                            else if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() - 1)
-                                this.swipeRight();
-                            else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() + 1)
-                                this.swipeTop();
-                            else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() - 1)
-                                this.swipeBottom();
+                        for (GemCell currGem : gemCellList.values()) {
+                            boolean isSameGem = (gemCell.getX() == currGem.getX()) && (currGem.getY() == gemCell.getY());
 
-                            currGem.setSelected(false);
-                            gemCell.setSelected(false);
-                            break;
+                            if (currGem.isSelected() && !isSameGem) {
+                                if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() + 1)
+                                    this.swipeLeft();
+                                else if (gemCell.getX() == currGem.getX() && gemCell.getY() == currGem.getY() - 1)
+                                    this.swipeRight();
+                                else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() + 1)
+                                    this.swipeTop();
+                                else if (gemCell.getY() == currGem.getY() && gemCell.getX() == currGem.getX() - 1)
+                                    this.swipeBottom();
+                                else {
+                                    currGem.setSelected(false);
+                                    break;
+                                }
+                                currGem.setSelected(false);
+                                gemCell.setSelected(false);
+
+                                break;
+                            }
                         }
                     }
                 }
@@ -199,11 +206,11 @@ public class GameActivity extends AppCompatActivity {
         if (gemCellList.containsKey(Arrays.asList(x, y))) {
             gemCellBeingDragged = gemCell;
             gemCellBeingReplaced = gemCellList.get(Arrays.asList(x, y));
-            gemInterchange(translation, positive);
+            gemInterchange(translation, positive, true);
         }
     }
 
-    private void gemInterchange(String translation, int positive) {
+    private void gemInterchange(final String translation, final int positive, final boolean userAction) {
         final ImageView animateGemDragged = createGemToAnimate(gemCellBeingDragged);
         final ImageView animateGemReplaced = createGemToAnimate(gemCellBeingReplaced);
 
@@ -244,9 +251,14 @@ public class GameActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         isSwipeRunning = false;
-                        findMatches();
+
+                        // Make gems return to initial position if noMatches
+                        boolean hasMatches = findMatches();
+                        if(!hasMatches && userAction) {
+                            gemInterchange(translation, positive, false);
+                        }
                     }
-                }, 100);
+                }, 200);
             }
         });
     }
@@ -310,7 +322,7 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
-    private void findMatches() {
+    private boolean findMatches() {
         boolean hasMatches = false;
         isAnimationsRunning = true;
 
@@ -341,8 +353,10 @@ public class GameActivity extends AppCompatActivity {
         }
         if (hasMatches) {
             removeMatches();
+            return true;
         } else {
             isAnimationsRunning = false;
+            return false;
         }
     }
 
