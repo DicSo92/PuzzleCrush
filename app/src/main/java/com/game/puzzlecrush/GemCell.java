@@ -31,41 +31,33 @@ public class GemCell extends GameActivity{
     public int getX() {
         return x;
     }
-
     public int getY() {
         return y;
     }
-
     public ImageView getImageView() {
         return this.imageView;
     }
-
     public void setImageView(ImageView imageView) {
         this.imageView = imageView;
     }
-
     public void updateImageView(int gem) {
         this.imageView.setImageResource(gem);
         this.imageView.setTag(gem);
         this.imageView.setVisibility(View.VISIBLE);
     }
-
     public boolean isEmpty() {
         return isEmpty;
     }
     public void setEmpty(boolean empty) {
         isEmpty = empty;
     }
-
     public boolean isMatched () {
         return isMatched;
     }
     public void setMatched (boolean matched) {
         isMatched = matched;
     }
-
     public boolean isSelected() { return isSelected; }
-
     public void setSelected(boolean selected) {
         imageView.setBackgroundResource(selected ? R.drawable.cell_border : 0); //kill surement la padding
         imageView.setPadding(10,10,10,10);
