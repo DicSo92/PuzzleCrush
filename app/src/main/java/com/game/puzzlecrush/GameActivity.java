@@ -85,22 +85,20 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void initBoardGems() {
-//        ArrayList<ImageView> imageViews;
+        // Add random gems to empty board
         for (int r = 0; r < gridRowCount; r++) {
             for (int c = 0; c < gridColCount; c++) {
                 ImageView imageView = new ImageView(this);
                 imageView.setVisibility(View.VISIBLE);
                 GemCell gemCell = new GemCell(r, c, imageView);
 
-
-
                 gridLayout.addView(gemCell.getImageView());
                 gemCellList.put(Collections.unmodifiableList(Arrays.asList(r, c)), gemCell);
             }
         }
 
+        // Prevent matches on first board
         boolean hasMatches = true;
-
         while (hasMatches) {
             hasMatches = false;
             for (GemCell gem : gemCellList.values()) {
