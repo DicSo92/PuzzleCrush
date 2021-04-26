@@ -85,7 +85,7 @@ public class GameActivity extends AppCompatActivity {
         initGemsSwipeListener();
         initPausePopupListeners();
 
-        initHero1();
+        initHeros();
 
         this.gameChronometer = new GameChronometer(this);
         this.gameTimer = new GameTimer(this);
@@ -93,31 +93,27 @@ public class GameActivity extends AppCompatActivity {
 
     private void initHeros() {
         for (int i = 0; i < heros.length; i++) {
-            Hero hero = new Hero(i, heros[i]);
+            LinearLayout heroArea = findViewById(getResources().getIdentifier("heroArea" + (i+1), "id", getPackageName()));
+            ImageView heroImg = findViewById(getResources().getIdentifier("heroImage" + (i+1), "id", getPackageName()));
+            final ImageView healthBar = findViewById(getResources().getIdentifier("healthBar" + (i+1), "id", getPackageName()));
+            final ImageView staminaBar = findViewById(getResources().getIdentifier("staminaBar" + (i+1), "id", getPackageName()));
+
+            Hero hero = new Hero(i, heroImg, heroArea, healthBar, staminaBar);
+            heroArea.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("testation");
+                    int healthLevel = healthBar.getDrawable().getLevel();
+                    int staminaLevel = staminaBar.getDrawable().getLevel();
+
+                    healthBar.getDrawable().setLevel(healthLevel - 500);
+                    staminaBar.getDrawable().setLevel(staminaLevel + 1000);
+                }
+            });
+
             heroList.add(hero);
         }
 
-    }
-
-    private void initHero1() {
-        this.hero1Btn = findViewById(R.id.heroArea1);
-        this.healthBar1 = findViewById(R.id.healthBar1);
-        this.staminaBar1 = findViewById(R.id.staminaBar1);
-
-        healthBar1.getDrawable().setLevel(10000);
-
-
-        hero1Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("testation");
-                int healthLevel = healthBar1.getDrawable().getLevel();
-                int staminaLevel = staminaBar1.getDrawable().getLevel();
-
-                healthBar1.getDrawable().setLevel(healthLevel - 500);
-                staminaBar1.getDrawable().setLevel(staminaLevel + 1000);
-            }
-        });
     }
 
 
