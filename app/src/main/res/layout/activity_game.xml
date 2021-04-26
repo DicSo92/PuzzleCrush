@@ -117,6 +117,10 @@
         </GridLayout>
 
 
+
+
+
+
         <LinearLayout
             android:id="@+id/heroLayout"
             android:layout_width="match_parent"
@@ -128,55 +132,207 @@
             app:layout_constraintStart_toStartOf="parent"
             android:orientation="horizontal">
 
-            <ImageButton
-                app:srcCompat="@drawable/hero_purple"
-                android:id="@+id/heroPurple"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
+            <LinearLayout
+                android:id="@+id/heroArea1"
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="2dp">
+                <ImageView
+                    android:id="@+id/heroImage1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:src="@drawable/hero_purple"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop">
 
-            <ImageButton
-                app:srcCompat="@drawable/hero_yellow"
-                android:id="@+id/heroYellow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
-                android:layout_weight="1"
+                </ImageView>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border">
+                    <ImageView
+                        android:id="@+id/healthBar1"
+                        android:src="@drawable/health_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border"
+                    android:layout_marginTop="1dp">
+                    <ImageView
+                        android:id="@+id/staminaBar1"
+                        android:src="@drawable/stamina_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+            </LinearLayout>
 
-                />
-            <ImageButton
-                app:srcCompat="@drawable/hero_red"
-                android:id="@+id/heroRed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
+            <LinearLayout
+                android:id="@+id/heroArea2"
+                android:layout_width="0dp"
                 android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="2dp">
+                <ImageView
+                    android:id="@+id/heroImage2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:src="@drawable/hero_yellow"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop">
 
-                />
-            <ImageButton
-                app:srcCompat="@drawable/hero_green"
-                android:id="@+id/heroGreen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
+                </ImageView>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border">
+                    <ImageView
+                        android:id="@+id/healthBar2"
+                        android:src="@drawable/health_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border"
+                    android:layout_marginTop="1dp">
+                    <ImageView
+                        android:id="@+id/staminaBar2"
+                        android:src="@drawable/stamina_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/heroArea3"
+                android:layout_width="0dp"
                 android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="2dp">
+                <ImageView
+                    android:id="@+id/heroImage3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:src="@drawable/hero_red"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop">
 
-                />
-            <ImageButton
-                app:srcCompat="@drawable/hero_blue"
-                android:id="@+id/heroBlue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="fitCenter"
-                android:adjustViewBounds="true"
+                </ImageView>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border">
+                    <ImageView
+                        android:id="@+id/healthBar3"
+                        android:src="@drawable/health_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border"
+                    android:layout_marginTop="1dp">
+                    <ImageView
+                        android:id="@+id/staminaBar3"
+                        android:src="@drawable/stamina_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/heroArea4"
+                android:layout_width="0dp"
                 android:layout_weight="1"
-                />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="2dp">
+                <ImageView
+                    android:id="@+id/heroImage4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:src="@drawable/hero_green"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop">
+
+                </ImageView>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border">
+                    <ImageView
+                        android:id="@+id/healthBar4"
+                        android:src="@drawable/health_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border"
+                    android:layout_marginTop="1dp">
+                    <ImageView
+                        android:id="@+id/staminaBar4"
+                        android:src="@drawable/stamina_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/heroArea5"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="2dp">
+                <ImageView
+                    android:id="@+id/heroImage5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:src="@drawable/hero_blue"
+                    android:layout_weight="1"
+                    android:scaleType="centerCrop">
+
+                </ImageView>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border">
+                    <ImageView
+                        android:id="@+id/healthBar5"
+                        android:src="@drawable/health_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_height="10dp"
+                    android:layout_width="match_parent"
+                    android:background="@drawable/health_bar_border"
+                    android:layout_marginTop="1dp">
+                    <ImageView
+                        android:id="@+id/staminaBar5"
+                        android:src="@drawable/stamina_bar_clip"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+                    </ImageView>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
 

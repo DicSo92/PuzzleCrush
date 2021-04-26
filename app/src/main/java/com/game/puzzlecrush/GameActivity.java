@@ -51,6 +51,18 @@ public class GameActivity extends AppCompatActivity {
     HashMap<List<Integer>, GemCell> gemCellList = new HashMap<>();
 
 
+    LinearLayout hero1Btn;
+    ImageView healthBar1;
+    ImageView staminaBar1;
+    public static int[] heros = {
+            R.drawable.hero_purple,
+            R.drawable.hero_yellow,
+            R.drawable.hero_red,
+            R.drawable.hero_green,
+            R.drawable.hero_blue,
+    };
+    ArrayList<Hero> heroList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,9 +85,41 @@ public class GameActivity extends AppCompatActivity {
         initGemsSwipeListener();
         initPausePopupListeners();
 
+        initHero1();
+
         this.gameChronometer = new GameChronometer(this);
         this.gameTimer = new GameTimer(this);
     }
+
+    private void initHeros() {
+        for (int i = 0; i < heros.length; i++) {
+            Hero hero = new Hero(i, heros[i]);
+            heroList.add(hero);
+        }
+
+    }
+
+    private void initHero1() {
+        this.hero1Btn = findViewById(R.id.heroArea1);
+        this.healthBar1 = findViewById(R.id.healthBar1);
+        this.staminaBar1 = findViewById(R.id.staminaBar1);
+
+        healthBar1.getDrawable().setLevel(10000);
+
+
+        hero1Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("testation");
+                int healthLevel = healthBar1.getDrawable().getLevel();
+                int staminaLevel = staminaBar1.getDrawable().getLevel();
+
+                healthBar1.getDrawable().setLevel(healthLevel - 500);
+                staminaBar1.getDrawable().setLevel(staminaLevel + 1000);
+            }
+        });
+    }
+
 
     private void initGrid() {
         gridLayout.setColumnCount(gridColCount);
