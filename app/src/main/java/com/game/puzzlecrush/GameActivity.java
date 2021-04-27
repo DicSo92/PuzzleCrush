@@ -85,39 +85,90 @@ public class GameActivity extends AppCompatActivity {
         initGemsSwipeListener();
         initPausePopupListeners();
 
-        initHero1();
+        initHeros();
+        initMonsters();
 
         this.gameChronometer = new GameChronometer(this);
         this.gameTimer = new GameTimer(this);
     }
 
+    private void initMonsters() {
+        GridLayout monsterGridTop = findViewById(R.id.monsterGridTop);
+        GridLayout monsterGridBottom = findViewById(R.id.monsterGridBottom);
+        monsterGridTop.setColumnCount(gridColCount);
+        monsterGridTop.setRowCount(2);
+        gridLayout.getLayoutParams().width = screenWidth;
+
+//        for (int i = 0; i < 7; i++) {
+//            ImageView img = new ImageView(this);
+//
+//            img.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
+////            img.setMaxHeight(cellWidth*2);
+////            img.setMaxWidth(cellWidth*2);
+//
+//            img.setImageResource(R.drawable.hero_green);
+//            img.setBackgroundResource(R.drawable.cell_border);
+//
+//            monsterGridTop.addView(img);
+//        }
+
+        // Top Grid ---------------------------------------
+        ImageView img1 = new ImageView(this);
+        img1.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
+        img1.setImageResource(R.drawable.hero_green);
+        img1.setBackgroundResource(R.drawable.cell_border);
+        monsterGridTop.addView(img1);
+
+        ImageView empty = new ImageView(this);
+        empty.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*3, cellWidth*2));
+//        empty.setBackgroundResource(R.drawable.cell_border);
+        monsterGridTop.addView(empty);
+
+        ImageView img2 = new ImageView(this);
+        img2.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
+        img2.setImageResource(R.drawable.hero_green);
+        img2.setBackgroundResource(R.drawable.cell_border);
+        monsterGridTop.addView(img2);
+        // ------------------------------------------------
+
+
+        // Bottom Grid ------------------------------------
+        ImageView emptyBottom = new ImageView(this);
+        emptyBottom.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
+//        empty.setBackgroundResource(R.drawable.cell_border);
+        monsterGridBottom.addView(emptyBottom);
+
+        ImageView imgMid = new ImageView(this);
+        imgMid.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*3, cellWidth*2));
+        imgMid.setImageResource(R.drawable.hero_green);
+        imgMid.setBackgroundResource(R.drawable.cell_border);
+        monsterGridBottom.addView(imgMid);
+        // ------------------------------------------------
+    }
+
     private void initHeros() {
         for (int i = 0; i < heros.length; i++) {
-            Hero hero = new Hero(i, heros[i]);
+            LinearLayout heroArea = findViewById(getResources().getIdentifier("heroArea" + (i+1), "id", getPackageName()));
+            ImageView heroImg = findViewById(getResources().getIdentifier("heroImage" + (i+1), "id", getPackageName()));
+            final ImageView healthBar = findViewById(getResources().getIdentifier("healthBar" + (i+1), "id", getPackageName()));
+            final ImageView staminaBar = findViewById(getResources().getIdentifier("staminaBar" + (i+1), "id", getPackageName()));
+
+            Hero hero = new Hero(i, heroImg, heroArea, healthBar, staminaBar);
+            heroArea.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    System.out.println("testation");
+                    int healthLevel = healthBar.getDrawable().getLevel();
+                    int staminaLevel = staminaBar.getDrawable().getLevel();
+
+                    healthBar.getDrawable().setLevel(healthLevel - 500);
+                    staminaBar.getDrawable().setLevel(staminaLevel + 1000);
+                }
+            });
+
             heroList.add(hero);
         }
 
-    }
-
-    private void initHero1() {
-        this.hero1Btn = findViewById(R.id.heroArea1);
-        this.healthBar1 = findViewById(R.id.healthBar1);
-        this.staminaBar1 = findViewById(R.id.staminaBar1);
-
-        healthBar1.getDrawable().setLevel(10000);
-
-
-        hero1Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                System.out.println("testation");
-                int healthLevel = healthBar1.getDrawable().getLevel();
-                int staminaLevel = staminaBar1.getDrawable().getLevel();
-
-                healthBar1.getDrawable().setLevel(healthLevel - 500);
-                staminaBar1.getDrawable().setLevel(staminaLevel + 1000);
-            }
-        });
     }
 
 
