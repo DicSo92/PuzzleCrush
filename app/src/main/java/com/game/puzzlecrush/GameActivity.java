@@ -20,11 +20,20 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import org.json.JSONException;
+
+import static java.lang.System.*;
 
 public class GameActivity extends AppCompatActivity {
     private ImageButton pauseBtn;
@@ -92,30 +101,72 @@ public class GameActivity extends AppCompatActivity {
         this.gameTimer = new GameTimer(this);
     }
 
+    public String loadJSONFromAsset() {
+        String json = null;
+        InputStream is = null;
+        try {
+            is = getResources().openRawResource(R.raw.monster_template);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
     private void initMonsters() {
+        ArrayList<HashMap<String, Boolean[]>> monsterTemplate = new ArrayList<>();
+
+        try {
+            JSONArray jsonMonster = new JSONArray(loadJSONFromAsset());
+
+            for (int i = 0; i < jsonMonster.length() ; i++) {
+                JSONObject el = jsonMonster.getJSONObject(i);
+                HashMap<String, Boolean[]> monster = new HashMap<>();
+
+                JSONArray indexesTop = el.getJSONArray("top");
+                JSONArray indexesBot = el.getJSONArray("bottom");
+
+                Boolean[] monsterTop = new Boolean[7];
+                Boolean[] monsterBot = new Boolean[7];
+
+                for (int iTop = 0; iTop < indexesTop.length(); iTop++) {
+                    int cell = indexesTop.getInt(iTop);
+
+                    monsterTop[iTop] = cell == 1;
+                }
+                for (int iBot = 0; iBot < indexesBot.length(); iBot++) {
+                    int cell = indexesTop.getInt(iBot);
+
+                    monsterBot[iBot] = cell == 1;
+                }
+                monster.put("top", monsterTop);
+                monster.put("botttom", monsterBot);
+                monsterTemplate.add(monster);
+            }
+            out.println(monsterTemplate.get(2).get("top")[5]);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
         GridLayout monsterGridTop = findViewById(R.id.monsterGridTop);
         GridLayout monsterGridBottom = findViewById(R.id.monsterGridBottom);
         monsterGridTop.setColumnCount(gridColCount);
         monsterGridTop.setRowCount(2);
         gridLayout.getLayoutParams().width = screenWidth;
 
-//        for (int i = 0; i < 7; i++) {
-//            ImageView img = new ImageView(this);
-//
-//            img.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-////            img.setMaxHeight(cellWidth*2);
-////            img.setMaxWidth(cellWidth*2);
-//
-//            img.setImageResource(R.drawable.hero_green);
-//            img.setBackgroundResource(R.drawable.cell_border);
-//
-//            monsterGridTop.addView(img);
-//        }
+        int monsterGridHeight = findViewById(R.id.monsterGrid).getTop();
+        out.println(monsterGridHeight);
+
 
         // Top Grid ---------------------------------------
         ImageView img1 = new ImageView(this);
-        img1.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-        img1.setImageResource(R.drawable.hero_green);
+        img1.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, monsterGridHeight));
+        img1.setImageResource(R.drawable.monster_red_1);
         img1.setBackgroundResource(R.drawable.cell_border);
         monsterGridTop.addView(img1);
 
@@ -157,7 +208,7 @@ public class GameActivity extends AppCompatActivity {
             heroArea.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    System.out.println("testation");
+                    out.println("testation");
                     int healthLevel = healthBar.getDrawable().getLevel();
                     int staminaLevel = staminaBar.getDrawable().getLevel();
 
