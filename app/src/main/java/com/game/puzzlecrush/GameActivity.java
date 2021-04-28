@@ -115,7 +115,7 @@ public class GameActivity extends AppCompatActivity {
         // Top Grid ---------------------------------------
         ImageView img1 = new ImageView(this);
         img1.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-        img1.setImageResource(R.drawable.hero_green);
+        img1.setImageResource(R.drawable.monster_blue_1);
         img1.setBackgroundResource(R.drawable.cell_border);
         monsterGridTop.addView(img1);
 
@@ -126,7 +126,7 @@ public class GameActivity extends AppCompatActivity {
 
         ImageView img2 = new ImageView(this);
         img2.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-        img2.setImageResource(R.drawable.hero_green);
+        img2.setImageResource(R.drawable.monster_green_2);
         img2.setBackgroundResource(R.drawable.cell_border);
         monsterGridTop.addView(img2);
         // ------------------------------------------------
@@ -140,7 +140,7 @@ public class GameActivity extends AppCompatActivity {
 
         ImageView imgMid = new ImageView(this);
         imgMid.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*3, cellWidth*2));
-        imgMid.setImageResource(R.drawable.hero_green);
+        imgMid.setImageResource(R.drawable.monster_red_1);
         imgMid.setBackgroundResource(R.drawable.cell_border);
         monsterGridBottom.addView(imgMid);
         // ------------------------------------------------
