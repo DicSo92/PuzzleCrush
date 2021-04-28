@@ -1,6 +1,7 @@
 package com.game.puzzlecrush;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -72,6 +74,12 @@ public class GameActivity extends AppCompatActivity {
     };
     ArrayList<Hero> heroList = new ArrayList<>();
 
+    ArrayList<HashMap<String, Boolean[]>> monsterTemplate = new ArrayList<>();
+    ConstraintLayout monsterLayout;
+    GridLayout monsterGridTop;
+    GridLayout monsterGridBottom;
+    int monsterLayoutHeight;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +103,9 @@ public class GameActivity extends AppCompatActivity {
         initPausePopupListeners();
 
         initHeros();
-        initMonsters();
+
+        initMonsterTemplateArray();
+        initMonsterViews();
 
         this.gameChronometer = new GameChronometer(this);
         this.gameTimer = new GameTimer(this);
@@ -116,10 +126,7 @@ public class GameActivity extends AppCompatActivity {
         }
         return json;
     }
-
-    private void initMonsters() {
-        ArrayList<HashMap<String, Boolean[]>> monsterTemplate = new ArrayList<>();
-
+    private void initMonsterTemplateArray() {
         try {
             JSONArray jsonMonster = new JSONArray(loadJSONFromAsset());
 
@@ -151,46 +158,37 @@ public class GameActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
-
-        GridLayout monsterGridTop = findViewById(R.id.monsterGridTop);
-        GridLayout monsterGridBottom = findViewById(R.id.monsterGridBottom);
+    private void initMonsterViews() {
+        this.monsterLayout = findViewById(R.id.monsterLayout);
+        this.monsterGridTop = findViewById(R.id.monsterGridTop);
+        this.monsterGridBottom = findViewById(R.id.monsterGridBottom);
         monsterGridTop.setColumnCount(gridColCount);
-        monsterGridTop.setRowCount(2);
-        gridLayout.getLayoutParams().width = screenWidth;
+        monsterGridTop.setRowCount(1);
 
-        int monsterGridHeight = findViewById(R.id.monsterGrid).getTop();
-        out.println(monsterGridHeight);
+        final ViewTreeObserver observer= monsterLayout.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                monsterLayoutHeight = monsterLayout.getHeight();
+                displayMonsters();
+                monsterLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+    }
 
-
-        // Top Grid ---------------------------------------
-        ImageView img1 = new ImageView(this);
-        img1.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, monsterGridHeight));
-        img1.setImageResource(R.drawable.monster_red_1);
-        img1.setBackgroundResource(R.drawable.cell_border);
-        monsterGridTop.addView(img1);
-
-        ImageView empty = new ImageView(this);
-        empty.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*3, cellWidth*2));
-//        empty.setBackgroundResource(R.drawable.cell_border);
-        monsterGridTop.addView(empty);
-
-        ImageView img2 = new ImageView(this);
-        img2.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-        img2.setImageResource(R.drawable.hero_green);
-        img2.setBackgroundResource(R.drawable.cell_border);
-        monsterGridTop.addView(img2);
-        // ------------------------------------------------
-
+    private void displayMonsters() {
+        out.println(monsterTemplate.get(2).get("top")[5]);
 
         // Bottom Grid ------------------------------------
-        ImageView emptyBottom = new ImageView(this);
-        emptyBottom.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*2, cellWidth*2));
-//        empty.setBackgroundResource(R.drawable.cell_border);
+        ImageView emptyBottom = new ImageView(GameActivity.this);
+        emptyBottom.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth*2));
+        //        empty.setBackgroundResource(R.drawable.cell_border);
         monsterGridBottom.addView(emptyBottom);
 
-        ImageView imgMid = new ImageView(this);
-        imgMid.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*3, cellWidth*2));
+        ImageView imgMid = new ImageView(GameActivity.this);
+        imgMid.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*5, monsterLayoutHeight));
         imgMid.setImageResource(R.drawable.hero_green);
         imgMid.setBackgroundResource(R.drawable.cell_border);
         monsterGridBottom.addView(imgMid);
