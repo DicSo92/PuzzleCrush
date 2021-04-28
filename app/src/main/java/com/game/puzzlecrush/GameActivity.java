@@ -164,36 +164,72 @@ public class GameActivity extends AppCompatActivity {
         this.monsterLayout = findViewById(R.id.monsterLayout);
         this.monsterGridTop = findViewById(R.id.monsterGridTop);
         this.monsterGridBottom = findViewById(R.id.monsterGridBottom);
-        monsterGridTop.setColumnCount(gridColCount);
-        monsterGridTop.setRowCount(1);
 
         final ViewTreeObserver observer= monsterLayout.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 monsterLayoutHeight = monsterLayout.getHeight();
-                displayMonsters();
+
+                displayMonsters3();
                 monsterLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
 
-    private void displayMonsters() {
-        out.println(monsterTemplate.get(2).get("top")[5]);
+    private void displayMonsters1() {
+//        out.println(monsterTemplate.get(2).get("top")[5]);
+//        int monsterHeight = cellWidth*5 > monsterLayoutHeight ? monsterLayoutHeight : cellWidth*5;
+        int monsterHeight = Math.min(cellWidth * 5, monsterLayoutHeight);
 
-        // Bottom Grid ------------------------------------
-        ImageView emptyBottom = new ImageView(GameActivity.this);
-        emptyBottom.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth, cellWidth*2));
-        //        empty.setBackgroundResource(R.drawable.cell_border);
-        monsterGridBottom.addView(emptyBottom);
-
-        ImageView imgMid = new ImageView(GameActivity.this);
-        imgMid.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth*5, monsterLayoutHeight));
-        imgMid.setImageResource(R.drawable.hero_green);
-        imgMid.setBackgroundResource(R.drawable.cell_border);
-        monsterGridBottom.addView(imgMid);
-        // ------------------------------------------------
+        addEmptyColumn(monsterGridTop, 1);
+        addMonster(monsterGridTop, 5, monsterHeight);
     }
+    private void displayMonsters2() {
+//        int monsterHeight = cellWidth*5 > monsterLayoutHeight ? monsterLayoutHeight : cellWidth*5;
+        int monsterHeight = Math.min(cellWidth * 3, monsterLayoutHeight);
+
+        addMonster(monsterGridTop, 3, monsterHeight);
+        addEmptyColumn(monsterGridTop, 1);
+        addMonster(monsterGridTop, 3, monsterHeight);
+    }
+    private void displayMonsters3() {
+//        int monsterHeight = cellWidth*5 > monsterLayoutHeight ? monsterLayoutHeight : cellWidth*5;
+        int extMonsterHeight = Math.min(cellWidth * 2, monsterLayoutHeight);
+        int midMonsterHeight = cellWidth * 3;
+
+        int heightSum = extMonsterHeight + midMonsterHeight;
+        if (heightSum > monsterLayoutHeight) {
+            int diff = heightSum - monsterLayoutHeight;
+
+            midMonsterHeight = midMonsterHeight - (diff/2);
+            extMonsterHeight = extMonsterHeight - (diff/2);
+        }
+
+        addMonster(monsterGridTop, 2, extMonsterHeight);
+        addEmptyColumn(monsterGridTop, 3);
+        addMonster(monsterGridTop, 2, extMonsterHeight);
+
+        addEmptyColumn(monsterGridBottom, 2);
+        addMonster(monsterGridBottom, 3, midMonsterHeight);
+    }
+
+
+
+    private void addEmptyColumn(GridLayout monsterGrid, int offset) {
+        ImageView emptyColumn = new ImageView(GameActivity.this);
+        emptyColumn.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth * offset, 0));
+//        emptyColumn.setBackgroundResource(R.drawable.cell_border);
+        monsterGrid.addView(emptyColumn);
+    }
+    private void addMonster(GridLayout monsterGrid, int columns, int height) {
+        ImageView monsterImg = new ImageView(GameActivity.this);
+        monsterImg.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth * columns, height));
+        monsterImg.setImageResource(R.drawable.hero_green);
+        monsterImg.setBackgroundResource(R.drawable.cell_border);
+        monsterGrid.addView(monsterImg);
+    }
+
 
     private void initHeros() {
         for (int i = 0; i < heros.length; i++) {
