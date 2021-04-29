@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.GridLayout;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.json.JSONException;
 
@@ -142,13 +144,13 @@ public class GameActivity extends AppCompatActivity {
 
                 for (int j = 0; j < indexesTop.length(); j++) {
                     int cellTop = indexesTop.getInt(j);
-                    int cellBot = indexesTop.getInt(j);
+                    int cellBot = indexesBot.getInt(j);
 
                     monsterTop[j] = cellTop;
                     monsterBot[j] = cellBot;
                 }
                 monster.put("top", monsterTop);
-                monster.put("botttom", monsterBot);
+                monster.put("bottom", monsterBot);
                 monsterTemplate.add(monster);
             }
             out.println(monsterTemplate.get(2).get("top")[5]);
@@ -169,58 +171,154 @@ public class GameActivity extends AppCompatActivity {
                 monsterLayoutHeight = monsterLayout.getHeight();
 
                 displayMonsters();
+//                displayMonstersTop();
+//                displayMonstersBottom();
                 monsterLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
     }
-
     private void displayMonsters() {
         HashMap<String, int[]> template = monsterTemplate.get(4);
-        int[] topTemplate = template.get("top");
-        int[] bottomTemplate = template.get("bottom");
+        for (String key:  template.keySet()) {
+            out.println("keyyyyyyyyyyyy" + key);
+            int emptySize = 0;
+            int monsterSize = 0;
+            int previousValue = 0;
+            int[] currTemplate = template.get(key);
+            GridLayout placement = key.equals("top") ? monsterGridTop : monsterGridBottom;
 
-
-        int emptySize = 0;
-        int monsterSize = 0;
-        int currentIndex = 0;
-        int previousValue = 0;
-
-        while (currentIndex < gridColCount) {
-            for (int i = 0; i < topTemplate.length; i++) {
-
-                if (topTemplate[i] == 0 && currentIndex == i) {
+            for (int i = 0; i < currTemplate.length; i++) {
+                if (currTemplate[i] == 0) {
                     if (monsterSize > 0) {
-                        int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
-                        addMonster(monsterGridTop, monsterSize, topMonsterHeight);
+                        initMonsterSize(key, monsterSize);
                     }
                     monsterSize = 0;
                     emptySize++;
-                    break;
                 }
-                if (topTemplate[i] > 0 && currentIndex == i) {
+                else if (currTemplate[i] > 0) {
                     if (emptySize > 0) {
-                        addEmptyColumn(monsterGridTop, emptySize);
+                        addEmptyColumn(placement, emptySize);
                         emptySize = 0;
                     }
-                    else if (topTemplate[i] != previousValue && previousValue != 0) {
-                        int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
-                        addMonster(monsterGridTop, monsterSize, topMonsterHeight);
+                    else if (currTemplate[i] != previousValue && previousValue != 0) {
+                        initMonsterSize(key, monsterSize);
                         monsterSize = 0;
                     }
-                    previousValue = topTemplate[i];
+                    previousValue = currTemplate[i];
                     monsterSize++;
-                    break;
                 }
             }
-            currentIndex++;
-            
-            if(currentIndex == gridColCount && monsterSize > 0) {
-                int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
-                addMonster(monsterGridTop, monsterSize, topMonsterHeight);
-                monsterSize = 0;
+            if(monsterSize > 0) {
+                initMonsterSize(key, monsterSize);
+            }
+            else if (emptySize > 0) {
+                addEmptyColumn(placement, emptySize);
             }
         }
     }
+    private void initMonsterSize(String place, int monsterSize) {
+        int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
+        int bottomMonsterHeight = cellWidth * monsterSize;
+
+        if (place.equals("bottom")) {
+            int heightSum = topMonsterHeight + bottomMonsterHeight;
+            if (heightSum > monsterLayoutHeight) {
+                double diff = heightSum - monsterLayoutHeight;
+
+                bottomMonsterHeight = bottomMonsterHeight - (int) Math.ceil(diff/2);
+                topMonsterHeight = topMonsterHeight - (int) Math.floor(diff/2);
+            }
+        }
+
+        int finalHeight = place.equals("top") ? topMonsterHeight : bottomMonsterHeight;
+        GridLayout placement = place.equals("top") ? monsterGridTop : monsterGridBottom;
+
+        addMonster(placement, monsterSize, finalHeight);
+    }
+
+
+
+    private void displayMonstersTop() {
+        HashMap<String, int[]> template = monsterTemplate.get(3);
+        int[] topTemplate = template.get("top");
+        int[] bottomTemplate = template.get("bottom");
+
+        int emptySize = 0;
+        int monsterSize = 0;
+        int previousValue = 0;
+
+        for (int i = 0; i < topTemplate.length; i++) {
+            if (topTemplate[i] == 0) {
+                if (monsterSize > 0) {
+                    int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
+                    addMonster(monsterGridTop, monsterSize, topMonsterHeight);
+                }
+                monsterSize = 0;
+                emptySize++;
+            }
+            else if (topTemplate[i] > 0) {
+                if (emptySize > 0) {
+                    addEmptyColumn(monsterGridTop, emptySize);
+                    emptySize = 0;
+                }
+                else if (topTemplate[i] != previousValue && previousValue != 0) {
+                    int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
+                    addMonster(monsterGridTop, monsterSize, topMonsterHeight);
+                    monsterSize = 0;
+                }
+                previousValue = topTemplate[i];
+                monsterSize++;
+            }
+        }
+
+        if(monsterSize > 0) {
+            int topMonsterHeight = Math.min(cellWidth * monsterSize, monsterLayoutHeight);
+            addMonster(monsterGridTop, monsterSize, topMonsterHeight);
+            monsterSize = 0;
+        }
+    }
+    private void displayMonstersBottom() {
+        HashMap<String, int[]> template = monsterTemplate.get(3);
+        int[] bottomTemplate = template.get("bottom");
+
+        int emptySize = 0;
+        int monsterSize = 0;
+        int previousValue = 0;
+
+        for (int i = 0; i < bottomTemplate.length; i++) {
+            if (bottomTemplate[i] == 0) {
+                if (monsterSize > 0) {
+                    int bottomMonsterHeight = cellWidth * monsterSize;
+
+                    addMonster(monsterGridBottom, monsterSize, bottomMonsterHeight);
+                }
+                monsterSize = 0;
+                emptySize++;
+            }
+            else if (bottomTemplate[i] > 0) {
+                if (emptySize > 0) {
+                    addEmptyColumn(monsterGridBottom, emptySize);
+                    emptySize = 0;
+                }
+                else if (bottomTemplate[i] != previousValue && previousValue != 0) {
+                    int bottomMonsterHeight = cellWidth * monsterSize;
+
+                    addMonster(monsterGridBottom, monsterSize, bottomMonsterHeight);
+                    monsterSize = 0;
+                }
+                previousValue = bottomTemplate[i];
+                monsterSize++;
+            }
+        }
+
+        if(monsterSize > 0) {
+            int bottomMonsterHeight = cellWidth * monsterSize;
+
+            addMonster(monsterGridBottom, monsterSize, bottomMonsterHeight);
+            monsterSize = 0;
+        }
+    }
+
 
     private void displayMonsters1() {
         int topMonsterHeight = Math.min(cellWidth * 5, monsterLayoutHeight);
@@ -305,8 +403,8 @@ public class GameActivity extends AppCompatActivity {
 
     private void addEmptyColumn(GridLayout monsterGrid, int offset) {
         ImageView emptyColumn = new ImageView(GameActivity.this);
-        emptyColumn.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth * offset, 20));
-        emptyColumn.setBackgroundResource(R.drawable.cell_border);
+        emptyColumn.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth * offset, 0));
+//        emptyColumn.setBackgroundResource(R.drawable.cell_border);
         monsterGrid.addView(emptyColumn);
     }
     private void addMonster(GridLayout monsterGrid, int columns, int height) {
@@ -314,6 +412,11 @@ public class GameActivity extends AppCompatActivity {
         monsterImg.setLayoutParams(new android.view.ViewGroup.LayoutParams(cellWidth * columns, height));
         monsterImg.setImageResource(R.drawable.hero_green);
         monsterImg.setBackgroundResource(R.drawable.cell_border);
+
+        GridLayout.LayoutParams params = new GridLayout.LayoutParams(monsterImg.getLayoutParams());
+        params.setGravity(Gravity.CENTER);
+        monsterImg.setLayoutParams(params);
+
         monsterGrid.addView(monsterImg);
     }
 
