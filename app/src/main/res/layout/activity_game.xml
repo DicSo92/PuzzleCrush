@@ -93,7 +93,7 @@
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/monsterGrid"
+            android:id="@+id/monsterLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
 
@@ -101,7 +101,8 @@
             app:layout_constraintBottom_toTopOf="@+id/gemGrid"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/topComponents">
+            app:layout_constraintTop_toBottomOf="@+id/topComponents"
+            android:layout_marginBottom="20dp">
 
             <GridLayout
                 android:id="@+id/monsterGridTop"
@@ -114,8 +115,7 @@
                 android:id="@+id/monsterGridBottom"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/monsterGridTop" />
+                app:layout_constraintBottom_toBottomOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
